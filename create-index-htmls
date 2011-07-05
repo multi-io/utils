@@ -1,0 +1,23 @@
+#!/bin/sh
+
+self="`basename $0`"
+header='<html>\n<body>\n'
+footer='</body>\n</html>'
+
+
+if [ ! -f index.html -o -f ".index_html_created_by_$self" ]; then
+  (printf "$header";
+   if [ -n "$1" ]; then
+     printf '<a href="..">../</a><br>\n';
+   fi
+   find . -maxdepth 1 -mindepth 1 -type d | sort | sed 's!^.*$!<a href="&">&/</a><br>!';
+   printf '<br>';
+   find . -maxdepth 1 -mindepth 1 -type f | grep -v index.html | sort | sed 's!^..\(.*\)$!<a href="\1">\1</a><br>!'
+   printf "$footer") >index.html
+  touch ".index_html_created_by_$self"
+fi
+
+find . -maxdepth 1 -mindepth 1 -type d |
+while read d; do
+  (cd "$d" && "$self" 1;)
+done

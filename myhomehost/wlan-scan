@@ -1,0 +1,3 @@
+#!/bin/sh
+
+iwlist ath0 scan

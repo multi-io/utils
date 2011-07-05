@@ -1,0 +1,60 @@
+#!/bin/bash
+# dirty hack to make the notoriously unstable and windowsish "xmule" application
+#  run "continuously"
+
+rate_high() {
+    rate=`log-transferrate ppp0 | head -2 | tail -1 | grepre 'out: (.*?)[\. ]'`
+    [ $rate -gt 8000 ] && return 0 || return 1
+}
+
+echo "ensure that mouse pointer hovers over xmule's 'connect' button while this prg runs!!"
+
+firstrun=1;
+while true; do
+    echo "waiting for port 4662 to become available..."
+    while netstat -tulpe 2>/dev/null | grep -q 4662; do sleep 1; done
+
+    if [ -z "$firstrun" ]; then
+       echo "wating 20 sec..."
+       sleep 20
+    fi
+
+    firstrun=""
+
+    echo "starting xmule"
+    xmule &
+    xmule_pid=$!
+    echo "xmule running, pid=$xmule_pid. Wating 50 sec..."
+    sleep 50
+
+    echo "clicking mouse (hopefully on connect button)"
+    mouseclick
+
+    echo "wating 50 sec..."
+    sleep 50
+
+    while true; do
+        echo "monitoring output transfer rate..."
+        while rate_high; do sleep 5; done
+        if ! ps a | grep $xmule_pid | grep -v grep | grep -q $xmule_pid; then
+            echo "pid $xmule_pid not running anymore..."
+            break;
+        fi
+        echo "output rate has dropped below 8000 Bytes/s, but xmule still running, checking whether it hangs..."
+        echo "sleep 20..."
+        sleep 20;
+        echo "checking output rate 4 times in >=60 secs..."
+        if ! rate_high && sleep 20 && ! rate_high && sleep 20 && ! rate_high && sleep 20 && ! rate_high; then
+            echo "output was  below 8000 Bytes/s 5 times in a row."
+            break;
+        fi
+    done
+
+    echo "assuming xmule has died (but over-killing now to be sure)."
+    kill $xmule_pid; sleep 5; kill -9 $xmule_pid
+    rm -f core*
+done
+
+
+
+# TODO: was, wenn "Connect" nicht im ersten Versuch funktioniert?

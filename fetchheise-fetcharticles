@@ -1,0 +1,59 @@
+#!/usr/bin/perl -w
+# in: URLs of article pages on stdin, one per line
+# out: those articles, including subject, time, author, msgid, and body,
+#      as plain text, encoded in ISO latin1
+
+sub unquote($) {
+    $_[0] =~ s/\n//g;
+    $_[0] =~ s/<br>/\n/g;
+    $_[0] =~ s!<br/>!\n!g;
+    $_[0] =~ s!<br />!\n!g;
+    $_[0] =~ s/&nbsp;?/ /g;
+    $_[0] =~ s/<.*?>//g;
+    $_[0] =~ s/&gt;?/>/g;
+    $_[0] =~ s/&lt;?/</g;
+    $_[0] =~ s/&auml;?/ä/g;
+    $_[0] =~ s/&uuml;?/ü/g;
+    $_[0] =~ s/&ouml;?/ö/g;
+    $_[0] =~ s/&Auml;?/Ä/g;
+    $_[0] =~ s/&Uuml;?/Ü/g;
+    $_[0] =~ s/&Ouml;?/Ö/g;
+    $_[0] =~ s/&szlig;?/ß/g;
+    $_[0] =~ s/&quot;?/\"/g;
+    $_[0] =~ s/&amp;?/&/g;
+}
+
+use Getopt::Long;
+
+$outfilebase = undef;
+exit(1) unless GetOptions ("outfilebase=s"  => \$outfilebase,
+                          );
+
+while (<STDIN>) {
+    chomp; $url=$_;
+    ($msgid) =  ($url =~ /msg-(\d+)/);
+    open(WGET, "wget-withbrowsersettings -q -O- '$url' |") or die "couldn't run wget-withbrowsersettings: $!";
+    local $/ = undef;
+    my ($time,$subject,$author,$body) = <WGET> =~ m!class="posting_date">(.*?)</div>.*?class="posting_subject">(.*?)<.*?<i>(.*?)</i>.*?<p class="posting_text">(.*?)</p>!si;
+    unquote($subject); unquote($author); unquote($body);
+    if (defined($outfilebase)) {
+        open(OUT, ">$outfilebase$msgid");
+    } else {
+        *OUT = *STDOUT;
+    }
+    print OUT <<EOS;
+subject: $subject
+time: $time
+author: $author
+msgid: $msgid
+url: $url
+
+body:
+$body
+EOS
+    close(OUT) if (defined($outfilebase));
+    close(WGET);
+}
+
+
+# TODO: extract msgid of parent article (if any)

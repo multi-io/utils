@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+# IN: - lines with x y   on stdin
+#     - n (number of consecutive (x,y) pairs to average) on command line
+# 
+# OUT: - lines with x y on stdout, containing a "moving average" of
+#        the input data
+
+$num = $ARGV[0] or die "usage: $0 <number of consecutive (x,y) pairs to average>";
+
+$cnt=0;
+while (<STDIN>) {
+    ($x,$y)=/^\s*(.*?)\s+(.*)/;
+    if ($cnt==0) {
+        $startx = $x;
+        $avg=0;
+    }
+    $avg += $y/$num;
+    ++$cnt;
+    if ($cnt==$num) {
+        print "$startx $avg\n";
+        $cnt=0;
+    }
+}

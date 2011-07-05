@@ -1,0 +1,3 @@
+#!/bin/sh
+
+find . -name Kconfig | xargs cat >my_configure_help.txt

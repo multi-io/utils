@@ -1,0 +1,10 @@
+#!/bin/sh
+
+ifaceaddr eth0 | egrep '^2002' | \
+  while read addr; do
+    ip addr del "$addr" dev eth0;
+  done
+route -6 | grepre '^(2002.*?) ' | xargs -i ip -6 route del {}
+while route -6 | grep -q '^2000::/3'; do
+  ip -6 route del 2000::/3
+done

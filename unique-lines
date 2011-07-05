@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+# remove duplicate lines from stdin.  Like sort | uniq, but
+# is more time- and space-efficient (no sorting is performed).
+# (time: O(n) instead of O(nlogn),
+#  space: O(# of unique lines) vs. O(# of all lines))
+
+while(<STDIN>) {
+    unless ($seen{$_}) {
+        print;
+        $seen{$_}=1;
+    }
+}

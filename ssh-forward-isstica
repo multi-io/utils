@@ -1,0 +1,4 @@
+#!/bin/sh
+# run ssh-forward-isstssh first!
+
+ssh -nN -L 1494:redstart.isst.fhg.de:1494 isstunixhost sleep 86400

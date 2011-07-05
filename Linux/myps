@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ps -A fo pid,ppid,sid,pgid,tty8,stat,user,args

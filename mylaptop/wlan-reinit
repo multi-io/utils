@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -e
+
+modprobe -r iwlagn
+sleep 2
+modprobe iwlagn

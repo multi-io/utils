@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec x64 -joydev2 0 -joydev1 1 /home/olaf/c64/rspeedway.vsf

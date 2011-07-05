@@ -1,0 +1,5 @@
+#!/bin/sh
+
+gpg --keyserver gpg-keyserver.de --recv-keys "0x$1" &&
+( gpg --armor --export "$1" | apt-key add - ) &&
+echo "SUCCESS." || echo "FAILURE."

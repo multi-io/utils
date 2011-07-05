@@ -1,0 +1,4 @@
+#!/bin/sh
+
+plucker-build -M2 --noimages -f Heisenews http://www.heise.de/newsticker/pda/data/paket2.html &&
+coldsync -mr ~/.plucker/Heisenews.pdb

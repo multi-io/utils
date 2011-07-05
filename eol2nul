@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+while (<STDIN>) {
+    chomp;
+    print;
+    print "\0";
+}

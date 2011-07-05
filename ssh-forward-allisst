@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# TODO: race condition: ssh-forward-isstssh->(ssh-forward-myissthostssh|ssh-forward-isstcvs)...
+
+ssh-forward-isstssh &
+pid=$!
+sleep 20;
+ssh-forward-myissthostssh &
+ssh-forward-isstcvs &
+ssh-forward-isstica &
+
+wait $pid

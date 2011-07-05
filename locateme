@@ -1,0 +1,52 @@
+#!/bin/sh
+# should probably be named "whereami", but a program with that name already exists
+
+if [ $# -gt 0 ]; then
+  for attr in "$@"; do
+    $0 | grep "^$attr:" | sed "s/^$attr://"
+  done
+  exit 0
+fi
+
+hostname="`hostname 2>/dev/null`"
+domainname="`domainname 2>/dev/null`"
+
+case "$domainname" in
+    cs.tu-berlin.de)
+        place=cs
+        ;;
+    isst.fhg.de)
+        place=isst
+        ;;
+    *)
+        place="[unknown]"
+        ;;
+esac
+
+
+case "$hostname" in
+    tick)
+        place=myhomehost
+        ;;
+    tack)
+        place=myhomedesktop
+        ;;
+    teck)
+        place=mylaptop
+        ;;
+    swangoose)
+        place=myissthost
+        ;;
+esac
+
+
+osname="`uname`"
+osversion="`uname -r`"
+arch="`uname -m`"
+
+cat <<EOF
+place:$place
+osname:$osname
+osversion:$osversion
+arch:$arch
+EOF

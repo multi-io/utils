@@ -1,0 +1,6 @@
+#!/bin/sh
+
+for url in "$@"; do
+    echo $url >>urls.txt
+    wget "$url"
+done

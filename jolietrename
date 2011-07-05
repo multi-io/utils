@@ -1,0 +1,21 @@
+#!/usr/bin/perl -w
+
+use constant MAXLENGTH => 64;
+
+for my $fn (@ARGV) {
+    my ($base,$ext);
+    ($base,$ext) = ($fn =~ /(.*?)(\.[^\.]*)$/) or ($base,$ext) = ($fn,'');
+    if (length $ext > MAXLENGTH) {
+        print STDERR "$fn: extension too long."; next;
+    }
+    $base = substr $base, 0, (MAXLENGTH - length $ext);
+    my $newfn = "$base$ext";
+    unless ($fn eq $newfn) {
+        if (-f $newfn) {
+            print STDERR "mv $fn $newfn: target already exists\n";
+        }
+        else {
+            rename $fn, $newfn or print STDERR "mv $fn $newfn: unsuccessful: $!\n";
+        }
+    }
+}

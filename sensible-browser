@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+# This program is copyright 2002 by Joey Hess <joeyh@debian.org>,
+# and is licensed under the terms of the GNU GPL, version 2 or higher.
+#
+# Olaf Klischat <klischat@cs.tu-berlin.de>  special casing for Opera
+my $url=shift;
+if (exists $ENV{BROWSER}) {
+	foreach (split ':' , $ENV{BROWSER}) {
+		if (! /%s/) {
+			$_.=" %s";
+		}
+		# substitute %s with url, and %% to %.
+		s/%([%s])/$1 eq '%' ? '%' : $url/eg;
+		$ret=system split ' ', $_;
+		if ($ret >> 8 == 0) {
+			exit(0);
+		}
+		# on failure, continue to next in list
+	}
+
+	print STDERR "None of the browsers in \$BROWSER worked!\n";
+	exit 1;
+}
+
+
+{
+    my @ptbl;
+
+    sub initptbl {
+        if (!@ptbl) {
+            use Proc::ProcessTable;
+            @ptbl = @{(new Proc::ProcessTable)->table};        
+        }
+    }
+
+    sub is_running($) {
+        initptbl();
+        my $name = shift;
+        grep {$_->fname eq $name && $_->uid==$<} @ptbl;
+    }
+
+}
+
+
+if (exists $ENV{DISPLAY}) {
+    if (is_running("opera")) {
+        if ($url) {
+            exec "opera", "--remote", "openURL($url, new-window)";
+            exit 1;
+        } else {
+            exec "opera";
+            exit 1;
+        }
+    }
+    elsif (-e '/usr/bin/x-www-browser') {
+        exec '/usr/bin/x-www-browser', $url;
+        exit 1;
+    }
+    elsif (-e '/usr/bin/x-terminal-emulator' && -e '/usr/bin/www-browser') {
+        exec "x-terminal-emulator", "-e", "/usr/bin/www-browser", $url;
+        exit 1;
+    }
+}
+elsif (-e '/usr/bin/www-browser') {
+	exec '/usr/bin/www-browser', $url;
+	exit 1;
+}
+
+print STDERR "Couldn't find a suitable web browser!\n";
+print STDERR "Set the BROWSER environment variable to your desired browser.\n";
+exit 1;

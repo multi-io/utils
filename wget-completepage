@@ -1,0 +1,6 @@
+#!/bin/sh
+
+wget -r -L "$@"
+
+# TODO: nicht wirklich korrekt; zieht auch verlinkte Webseiten. Man
+# will sowas wie "save complete page" in Firefox

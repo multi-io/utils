@@ -1,0 +1,8 @@
+#!/bin/sh
+
+while true; do
+  if [ "`df | grep '/var$' | awk '{ print $3 }'`" -lt 40000 ]; then
+    killall -TERM mlnet 2>/dev/null;
+  fi
+  sleep 60;
+done

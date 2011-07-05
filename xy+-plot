@@ -1,0 +1,27 @@
+#!/usr/bin/ruby -w
+# IN: - lines with x y0 y1 ....yn   on stdin
+#     - (optional) xtitle ytitle0 ytitle1 ... ytitlen   on command line
+#
+# OUT: gnuplot script for plotting that data  on stdout
+
+samples = STDIN.readlines.map{|l|l.split}
+n_graphs = samples[0].length - 1
+case ARGV.length
+when samples[0].length
+  xtitle = ARGV[0]
+  ytitles = ARGV[1..-1]
+when 0
+  ytitles = (0...n_graphs).map{|i| "variable #{i}"}
+else
+  raise "unmatching arguments (must be either none or xtitle, ytitle0, ytitle1, ...)"
+end
+
+puts %Q{set xlabel "#{xtitle}"} if xtitle
+puts "plot #{ytitles.map{|title| "'-' with lines title '#{title}'"}.join(',')}"
+
+(1..n_graphs).each do |y_idx|
+  samples.each do |sample|
+    puts "#{sample[0]} #{sample[y_idx]}"
+  end
+  puts "e"
+end

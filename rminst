@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+##### see TODO below before use!
+
+# In:
+# list of files on stdin
+
+# Out:
+# listed files have been removed
+# EOF
+
+use strict;
+
+# remove a "dirempty" directory (i.e. one
+# that is either empty or contains only
+# "dirempty" directories)
+#
+# return 0 if directory wasn't dirempty, 1 else.
+# In the former case, some dirempty subdirs of
+# the given dir may still have been removed
+sub rmdiremptydir($);
+sub rmdiremptydir($) {
+    my $dir = shift;
+    return 0 unless -d $dir;
+    my $D;
+    opendir($D,$dir);
+    while (my $ent = readdir($D)) {
+        next if ($ent eq '.' or $ent eq '..');
+        my $subdir = "$dir/$ent";
+        return 0 unless -d $subdir;
+        return 0 unless rmdiremptydir($subdir);
+    }
+    rmdir $dir;
+    1;
+}
+
+
+
+my @filenames = <STDIN>;
+
+for my $filename (@filenames) {
+    chomp $filename;
+    unlink $filename if -f $filename;
+}
+
+# TODO: this will also delete "dirempty" directories
+# that were sub-directories of directories given
+# on stdin, but weren't themselves given on stdin
+for my $filename (@filenames) {
+    rmdiremptydir $filename if -d $filename;
+}

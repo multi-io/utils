@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+
+use constant MAXLENGTH => 64;
+
+use File::Find;
+
+find({ no_chdir=>1,
+       wanted => sub {
+           return unless -f;
+           ($dir,$base,$ext) = ($File::Find::name =~ m!^\./(.*/)?(.*?)(\.[^\.]*)?$!);
+           $dir='' unless defined($dir);
+           $ext='' unless defined($ext);
+           if (length "$dir$ext" > MAXLENGTH) {
+               print STDERR "$File::Find::name: dir+extension combined longer than ".MAXLENGTH." chars\n"; return;
+           }
+           $base = substr $base, 0, (MAXLENGTH - length "$dir$ext");
+           $newfn = './' . ($dir eq ''? '':$dir) . "$base$ext";
+           unless ($File::Find::name eq $newfn) {
+               my $n=1;
+               while (-f $newfn) {
+                   print STDERR "mv $File::Find::name $newfn: target already exists, appending number...\n";
+                   $base =~ s/.{${\(length $n)}}$/$n/;
+                   $n++;
+                   $newfn = './' . ($dir eq ''? '':$dir) . "$base$ext";
+               }
+               rename $File::Find::name, $newfn or print STDERR "mv $File::Find::name $newfn: unsuccessful: $!\n";
+           }
+       }}, '.');

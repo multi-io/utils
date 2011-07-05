@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+# IN: - lines with x y_0 y_1 ....y_n   on stdin
+#     - n (number of consecutive (x,y_0,...,y_n) tuples to average) on command line
+# 
+# OUT: - lines with x avg_0 avg_1 ... avg_n on stdout, where each avg_x is a
+#        "moving average" of n consecutive y_x's from the input data
+
+$num = $ARGV[0] or die "usage: $0 <number of consecutive (x,y) pairs to average>";
+
+$cnt=0;
+while (<STDIN>) {
+    ($x,@ys)=split;
+    if ($cnt==0) {
+        $startx = $x;
+        @avgs = map { 0 } @ys;
+    }
+    map { $avgs[$_] += $ys[$_]/$num }  (0..$#ys);
+    ++$cnt;
+    if ($cnt==$num) {
+        print "$startx " . join(' ', @avgs) . "\n";
+        $cnt=0;
+    }
+}

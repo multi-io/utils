@@ -1,0 +1,8 @@
+#!/bin/sh
+
+i=0;
+while [ $i -ne 256 ]; do
+    printf "$i: \\x`printf '%x' $i`\n"
+    i=$[ $i + 1 ]
+done
+

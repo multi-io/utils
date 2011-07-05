@@ -1,0 +1,301 @@
+#!/usr/bin/perl -w
+# $Id: videnc,v 1.5 2008/01/10 05:44:45 klischat Exp $
+# Copyright (c) 2003 Olaf Klischat. All rights reserved.
+#     This program is free software; you can redistribute it and/or
+#     modify it under the same terms as Perl itself.
+
+
+use strict;
+use Getopt::Long;
+use Date::Manip;
+use Pod::Usage;
+
+#use FileHandle;
+#autoflush STDOUT 1;
+
+sub date2str($) {
+    UnixDate($_[0],'%C');
+}
+
+sub delta2str($) {
+    Delta_Format($_[0],0,'%hhh %mvmin %svsec');
+}
+
+my ($start,$stop,$length,$size,$vbr,$abr,$res,$channel,$test);
+
+$abr=128;
+$res="pal";
+exit(1) unless GetOptions ("start=s"  => \$start,
+                           "length=s" => \$length,
+                           "stop=s"   => \$stop,
+                           "size=s" => \$size,
+                           "res=s" => \$res,
+                           "vbr=f"    => \$vbr,
+                           "channel=s"    => \$channel,
+                           "test" => \$test,
+                          );
+
+pod2usage(-msg     => "" ,
+          -exitval => 1  ,
+          -verbose => 2)
+  unless(@ARGV);
+
+
+die "--size only permitted in conjunction with --stop or --length"
+  if (defined($size) and not defined($stop) and not defined($length));
+
+die "--stop and --length are mutually exclusive"
+  if (defined($stop) and defined($length));
+
+die "--size and --vbr are mutually exclusive"
+  if (defined($size) and defined($vbr));
+
+my $outfile = shift @ARGV;
+print "output file: $outfile\n";
+
+my $now = ParseDate('now');
+$start = defined($start)? ParseDate($start) : $now;
+unless ($start) {
+    die "couldn't parse start time $start";
+}
+
+print "start time: " . date2str($start) . "\n";
+
+die "start time lies in the past"
+    if (1==Date_Cmp($now,$start));
+
+if (defined($stop)) {
+    die "couldn't parse stop time"
+      unless ($stop=ParseDate($stop));
+}
+elsif (defined($length)) {
+    die "couldn't parse length"
+      unless ($length=ParseDateDelta($length));
+    $stop = DateCalc($start,$length);
+}
+
+$vbr = 1800 unless defined($vbr);
+
+if (defined($stop)) {
+    print "stop time: " . date2str($stop) . "\n";
+
+    die "stop time must be greater than start time"
+      if (1==Date_Cmp($start,$stop));
+
+    $length = DateCalc($start,$stop);
+    print "length: " . delta2str($length) . "\n";
+
+
+    if (defined($size)) {
+        $size = lc $size;
+        $size =~ /^(\d+)([km]?)$/ or die 'invalid size specification, must be "<number>[k|m]"';
+        $size = $1*($2 eq 'k'? 2**10:2**20) if ($2);
+        $vbr = $size * 8.0 / Delta_Format($length, 0, '%sh') / 1000 - $abr;
+    }
+
+    $vbr = int($vbr);
+
+    $size = ($vbr + $abr) * 1000.0 / 8 * Delta_Format($length, 0, '%sh');
+
+    print "projected file size: $size bytes\n";
+}
+
+print "video bitrate: $vbr kbit/s\n";
+print "audio bitrate: $abr kbit/s\n";
+print "overall bitrate: " . ($vbr+$abr) . " kbit/s\n";
+
+die "vbr must be > 0. Choose larger size if necessary."
+  if $vbr<=0;
+
+die "vbr is insanely high"
+  if $vbr>20000;
+
+my %resAliases = (pal      => '768x576',
+                'pal/2'  => '384x288',
+                '1/2pal' => '384x288',
+                '2/3pal' => '512x384');
+$res = $resAliases{$res} if defined($resAliases{$res});
+my ($resX,$resY) = $res =~ /(\d+)x(\d+)/ or die "couldn't parse resolution from \"$res\"";
+print "resolution: ${resX}x${resY}\n";
+
+if (defined($channel)) {
+    open(XAWTVRC,"<$ENV{HOME}/.xawtv") or die "couldn't open $ENV{HOME}/.xawtv for verifying channel name";
+    grep /^\[$channel\]$/, <XAWTVRC> or die "channel $channel not found in $ENV{HOME}/.xawtv\n";
+    close XAWTVRC;
+    print "channel: $channel\n";
+}
+
+
+sub waitfortime($);
+sub start_encoder;
+sub stop_encoder;
+
+
+unless ($test) {
+    waitfortime($start);
+    start_encoder;
+
+    if ($stop) {
+        waitfortime($stop);
+        stop_encoder;
+    }
+    else { sleep; }
+}
+
+
+
+sub waitfortime($) {
+    my ($time) = @_;
+    sleep 10 while (-1 == Date_Cmp(ParseDate('now'),$time));
+}
+
+
+
+my ($encoder_pid, $scrsv_blocker_pid);
+
+sub start_encoder {
+    if ($channel) {
+        system qw/v4lctl setstation/, $channel;
+        system("sleep 2");
+    }
+    system("audioreset");
+
+    $scrsv_blocker_pid = fork();
+    die "couldn't fork() screensaver blocker: $!" unless defined($scrsv_blocker_pid);
+    if ($scrsv_blocker_pid==0) {
+        while(1) {
+            system "xscreensaver-command -deactivate >/dev/null 2>&1";
+            sleep 60;
+        }
+    }
+
+    $encoder_pid = fork();
+    die "couldn't fork() encoder process: $!" unless defined($encoder_pid);
+
+    if ($encoder_pid==0) {
+        my @cmd= (qw{mencoder
+                     tv:// -tv}, "driver=v4l2:width=$resX:height=$resY:adevice=/dev/dsp0",
+                  qw{-ovc lavc -lavcopts}, "vcodec=mpeg4:vbitrate=$vbr",
+                  qw{-oac mp3lame -lameopts}, "cbr:br=$abr:vol=1",
+                  '-vf', 'pp=tn/lb,crop=720:544:24:16', '-o', $outfile);
+        print "executing: @cmd\n";
+        exec @cmd  or die "couldn't exec mencoder: $!";
+    }
+
+    # test if mencoder exits early
+    eval {
+        local $SIG{ALRM} = sub { die "alarm clock restart" };
+        alarm 3;
+        waitpid($encoder_pid,0);
+        alarm 0;
+    };
+
+    if ($@ !~ /alarm clock restart/) {
+        kill 'SIGTERM', $scrsv_blocker_pid;
+        die "mencoder exited unexpectedly.";
+    }
+}
+
+
+sub stop_encoder {
+    kill 'SIGTERM', $encoder_pid;
+    kill 'SIGTERM', $scrsv_blocker_pid;
+    waitpid($encoder_pid,0);
+    waitpid($scrsv_blocker_pid,0);
+}
+
+
+#audioreset;
+
+#mencoder\
+# -tv on:driver=v4l:width=768:height=576:adevice=/dev/dsp0 -ovc lavc\
+# -lavcopts vcodec=mpeg4:vbitrate=1800\
+# -oac mp3lame -lameopts cbr:br=128:vol=1 -vop pp=tn/lb,crop=720:544:24:16\
+# -o "$1"
+
+
+# moeglichkeiten: 
+#
+#              Audio:
+#                 -lameopts ...:vol=[0..10]  -- audio "input gain" für lame.
+#                                              Default: ?
+#                 -tv ....:volume=[0..65535] -- Audiolautstaerke des v4l-Devices (TV-Karte).
+#                                               Default: 65535
+#                 extern: "igain"-Einstellung der Soundkarte
+
+
+__END__
+
+=head1 NAME
+
+videnc - encode divx from TV card
+
+=head1 SYNOPSIS
+
+videnc [options] outfile.avi
+
+=head1 DESCRIPTION
+
+records current programme from TV card, encodes it into outfile.avi.
+
+=head1 AUTHOR
+
+Olaf Klischat <klischat@cs.tu-berlin.de>
+
+=head1 OPTIONS
+
+All options may be specified in the form --<name> <value>,
+--<name>=<value>, -<name> <value>, or -<name>=<value>.
+Option names may be shortened as long as they remain unambiguous.
+
+=over 8
+
+=item B<--start <time>>
+
+When to start recording. Time in Date::Manip-compatible format.
+Default: current time
+
+=item B<--length <time>>
+
+Length of recording (Date::Manip time delta value).
+Default: unlimited length (until SIGTERM).
+
+=item B<--stop <time>>
+
+When to stop recording. Mutually exclusive with --length.
+Default: infinite.
+
+=item B<--size <num[k|m]>>
+
+Desired size of the file. Illegal if no stop time was specified
+or if video bitrate would be negative (audio bitrate is
+always 128 kbit/s).
+
+=item B<--vbr <num>>
+
+Desired video bitrate in kbit/sec. Default: 1800. Must be positive.
+Will be truncated to nearest smaller integer number.
+Audio bitrate (always 128 kbit/s) will be added to get the effective
+bitrate of the created file.
+Mutually exclusive with --size.
+
+=item B<--res <wxh|pal|1/2pal|pal/2|2/3pal>>
+
+Desired video resolution of the created file. Either of the
+form <width>x<height> (e.g. "600x400") or one of the defined
+aliases "pal" (768x576), "pal/2", "1/2pal" (384x288), and
+"2/3pal" (512x384).
+
+=item B<--channel <name>>
+
+xawtv channel name to switch to immediately before starting the
+encoder. videnc checks in ~/.xawtv whether this channel exists.
+Default: No channel (don't change channels before recording).
+
+=item B<--test>
+
+Test run. Say what would be done, but don't do anything.
+
+=back
+
+=cut

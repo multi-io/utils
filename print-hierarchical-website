@@ -1,0 +1,27 @@
+#!/bin/sh
+# print web-based multi-page documents having a single index/contents page
+# linking all existing sub-pages via relative links
+#
+# usage: print-hierarchical-website <url of index page>
+#
+# printing will be done using lpr [-P$PRINTER] in PostScript
+#
+# prerequisites: Perl, wget, html2ps
+#
+# TODO: funktion "printWebsite $site", darin Test-Modus kapseln
+#       (schwierig wg. xargs unten => evtl. alles in Perl schreiben)
+
+indexpage="$1"
+
+[ -n "$indexpage" ] || { echo "usage: $0 <url of index page>" >&1; exit 1; }
+
+base="`echo $indexpage | grepc '^(.*)/'`"
+
+LPR="lpr"
+[ -n "$PRINTER" ] && { LPR="$LPR -P$PRINTER"; }
+
+html2ps $indexpage | $LPR
+
+wget -O- "$indexpage" | \
+  perl -ne 'for (m!href="(.*?)[#"]!g) { print $_, "\n" unless($found{$_}); $found{$_}=1; }' | \
+  xargs -i /bin/sh -c "html2ps $base/{} | $LPR"

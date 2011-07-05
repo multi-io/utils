@@ -1,0 +1,6 @@
+#!/bin/sh
+
+ssh -2 -N -L 4000:`showhomeip`:4000 tick &  # telnet
+ssh -2 -N -L 4080:`showhomeip`:4080 tick &  # web
+ssh -2 -N -L 4001:`showhomeip`:4001 tick &  # gui
+ssh -2 -N -L 1213:`showhomeip`:1213 tick &  # GiFT (?)

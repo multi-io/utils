@@ -1,0 +1,14 @@
+#!/usr/bin/perl -w
+
+use Getopt::Std;
+
+my %opts;
+getopts('n', \%opts);
+
+my $sep = $opts{n}?' ':"\n";
+
+while (<>) {
+    chomp;
+    s/([\s"'()|&])/\\$1/g;
+    print "$_$sep";
+}

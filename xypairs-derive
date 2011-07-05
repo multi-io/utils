@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+$start=1;
+while (<STDIN>) {
+    ($x,$y)=/^(.*?) (.*)/;
+    if ($start) {
+        $start=0;
+        ($x0,$y0)=($x,$y);
+        next;
+    }
+    $d=($y-$y0)/($x-$x0);
+    print "$x $d\n";
+    ($x0,$y0)=($x,$y);
+}

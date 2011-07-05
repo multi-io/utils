@@ -1,0 +1,4 @@
+#!/usr/bin/perl -w
+
+print "${\(@ARGV+0)} arguments:\n";
+foreach (@ARGV) { print "'$_' "; }; print "\n";

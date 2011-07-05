@@ -1,0 +1,12 @@
+#!/bin/sh
+
+PID=`getpid $1` || exit -1;
+
+LASTSIZE=0;
+while true; do
+	CURSIZE=`ps hl $PID | sed 's/^ \+//g' | sed 's/ \+/@/g' |cut -d @ -f7`;
+	if [ $CURSIZE -ne $LASTSIZE ]; then printf '\x7'; fi
+	clear; echo $CURSIZE;
+	LASTSIZE=$CURSIZE;
+	usleep 150000;
+done

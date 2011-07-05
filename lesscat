@@ -1,0 +1,29 @@
+#!/usr/bin/ruby -w
+# lesscat file...
+#
+# pipe files through lesspipe like less does, if that didn't work out, cat them
+
+cmdline = ((ENV['LESSOPEN'] || raise('$LESSOPEN unset')) \
+                  .match(/^\|(.*)/) || raise('$LESSOPEN must be "| cmd args"'))[1].split
+
+argidx = cmdline.index('%s') || raise('$LESSOPEN command line must contain a %s')
+
+ARGV.each do |fn|
+  rd,wr = IO.pipe
+  if fork
+    #parent
+    wr.close
+    n_read=0
+    while (buf=rd.read(100)) != nil
+      STDOUT.write buf
+      n_read += buf.length
+    end
+    system "cat", fn if n_read==0
+  else
+    #child
+    rd.close
+    STDOUT.reopen wr
+    cmdline[argidx] = fn
+    exec(*cmdline)
+  end
+end

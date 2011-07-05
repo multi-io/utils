@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ -z "$CDR_DEVICE" ]; then
+    CDR_DEVICE="`getcdrdev`";
+fi
+
+mkisofs -R "$1" | cdrecord -v -speed=4 dev="$CDR_DEVICE" -data -

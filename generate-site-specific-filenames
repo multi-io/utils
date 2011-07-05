@@ -1,0 +1,21 @@
+#!/bin/sh
+
+myecho() {
+  printf $1'\n'
+}
+
+if test "$1" = -n; then
+  myecho() {
+    printf $1' '
+  }
+  shift
+fi
+
+base="$1"
+
+for ext in "`locateme place`" \
+           "`locateme osname`" \
+           "`locateme place`-`locateme osname`"; do
+    fn="$base$ext"
+    ( test -f "$fn" || test -d "$fn" || test -h "$fn" ) && myecho $fn
+done

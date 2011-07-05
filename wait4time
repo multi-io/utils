@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ $# != 1 ]; then
+  echo "usage: $0 <HM>" >&2
+  exit 1;
+fi
+
+HM="$1";
+
+while [ "`date +%H%M`" != $HM ]; do
+    sleep 2;
+done

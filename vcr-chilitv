@@ -1,0 +1,29 @@
+#!/bin/sh
+
+time='61129';
+length=4000;
+station=kika;
+prefix=chilitv;
+
+echo "time=$time";
+echo "length=$length";
+echo "station=$station";
+echo "prefix=$prefix";
+
+
+
+while true; do
+    while [ "`date +%u%H%M`" != "$time" ]; do
+	sleep 2;
+    done
+
+    xscreensaver-keepaway &
+    scsvpid=$!;
+
+    (v4lctl setstation "$station"; sleep 2; videnc.sh "$prefix-`date +%d%m%y`.avi") &
+
+    sleep $length && killall -TERM mencoder
+    kill -TERM $scsvpid;
+
+    sleep 60;
+done

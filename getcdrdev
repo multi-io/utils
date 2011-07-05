@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cdrecord -scanbus 2>/dev/null | grep DVDRAM | grepre '^\s*(\S+)' || \
+  cdrecord -scanbus dev=ATAPI 2>/dev/null | grep DVDRAM | grepre '^\s*(\S+)' | sed 's/^/ATAPI:/' || \
+  exit 1

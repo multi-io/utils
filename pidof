@@ -1,0 +1,34 @@
+#!/usr/bin/perl -w
+# 
+# author Olaf Klischat
+
+use strict;
+
+sub usage() {
+
+    print STDERR <<EOF;
+usage: pidof <name>
+
+print pid of process <name>
+EOF
+
+}
+
+
+if ($#ARGV == -1) {
+    usage(); exit -1;
+}
+
+use Proc::ProcessTable;
+my @ptbl = @{(new Proc::ProcessTable)->table};        
+
+
+my $name = $ARGV[0];
+for my $p (@ptbl) {
+    if ($p->fname eq $name) {
+        print $p->pid . "\n";
+        exit 0;
+    }
+}
+
+exit -1;

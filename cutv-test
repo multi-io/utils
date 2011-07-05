@@ -1,0 +1,47 @@
+#!/bin/sh
+
+input="`mktemp /tmp/cutv-test.XXXXXX`"
+expected="`mktemp /tmp/cutv-test.XXXXXX`"
+output="`mktemp /tmp/cutv-test.XXXXXX`"
+
+cat <<EOF  >$input
+l1
+l2
+===
+l4
+l5
+===
+l7
+l8
+l9
+l10
+===
+l12
+l13
+l14
+EOF
+
+./cutv -d '===' -l 5,3,13 -f 1,3 <$input >$output
+
+cat <<EOF  >$expected
+l1
+l2
+===
+l5
+l7
+l8
+l9
+l10
+l13
+EOF
+
+diff $expected $output
+
+if [ $? -eq 0 ]; then
+    echo "test SUCCEEDED!"
+    rm -f $output $input $expected
+    exit 0
+fi
+
+echo "test FAILED!"
+exit 1

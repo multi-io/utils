@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Scancodes: Crsr left: 100 Crsr right: 102
+#   nicht einzeln setzbar :-(
+
+xset r rate 150 30

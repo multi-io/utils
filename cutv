@@ -1,0 +1,62 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Std;
+
+our($opt_l, $opt_d, $opt_f);
+
+$opt_d='^\s*$';
+getopt('ldf');
+
+$opt_d = eval { qr/$opt_d/ };
+die "invalid regexp for -d: $@" if $@;
+
+for($opt_f, $opt_l) {
+    $_ = [sort {$a <=> $b} split(/,/, $_)] if ($_);
+}
+
+my $l_idx;
+my $l_next;
+if ($opt_l) {
+    $l_idx=0; $l_next=$$opt_l[0];
+}
+my $f_idx;
+my $f_next;
+if ($opt_f) {
+    $f_idx=0; $f_next=$$opt_f[0];
+}
+
+my $ln=1;
+my $fn=1;
+while (<STDIN>) {
+    my $on_sep = /$opt_d/;
+    if (defined($l_idx) and $ln==$l_next) {
+        print;
+        ++$l_idx;
+        if ($l_idx <= $#$opt_l) {
+            $l_next = $$opt_l[$l_idx];
+        } else {
+            $l_idx = undef;
+        }
+    } elsif (defined($f_idx) and $fn==$f_next and !$on_sep) {
+        print;
+    }
+
+    if ($on_sep) {
+        if (defined($f_idx) and $fn==$f_next) {
+            ++$f_idx;
+            if ($f_idx <= $#$opt_f) {
+                $f_next = $$opt_f[$f_idx];
+            } else {
+                $f_idx = undef;
+            }
+        }
+        ++$fn;
+    }
+
+    ++$ln;
+}
+
+
+# TODO: multi-line delimiters
+# TODO: start and end delimiters

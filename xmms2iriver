@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+# convert XMMS .m3u files to .m3u files suitable for IRiver players
+# ("\" instead of "/", CRLF line terminators).  Replace specified
+# pathname prefixes with specified replacements in the process.
+
+# XMMS .m3u on stdin, .m3u for IRiver players on stdout.
+#
+# usage: xmms2iriver [-cf] [prefix1 replacement1 prefix2 replacement2 ...]
+#   default: prefix1=/usr/local/mp3s, replacement1=favsongs
+#
+#  -c copy any source file to corresponding destionation unless source
+#     and destination have identical names (that is, unless no
+#     replacement took place on that filename)
+#
+#  -f copy even if destination file exists
+
+use POSIX;
+use File::Copy 'cp';
+use Getopt::Std;
+
+our ($opt_c,$opt_f);
+getopts('cf');
+
+my @repls;
+while (@ARGV) {
+    push @repls, [shift @ARGV, shift @ARGV];
+}
+
+unless (@repls) {
+    @repls = (['/usr/local/mp3s','favsongs']);
+}
+
+while (<STDIN>) {
+    next if (/^\s*\#/);
+    chomp;
+    my $orig = $_;
+    for $repl (@repls) {
+        s!$repl->[0]!$repl->[1]!g;
+    }
+    if ($opt_c and !($orig eq $_) and ($opt_f or ! -f $_)) {
+        cp($orig, $_) or die "could copy '$orig' to '$_': $!";
+    }
+    elsif (! -f $_) {
+        die "file not found: $_: $!";
+    }
+    # touch the file so the user may delete files not in the list afterwards
+    utime time(), time(), $_;
+    s!/!\\!g;
+    print "$_\x{d}\x{a}";
+}

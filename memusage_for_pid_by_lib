@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+pid=Integer(ARGV[0])
+
+File.open("/proc/#{pid}/maps") do |mapsfile|
+  mapsfile.readlines.map do |l|
+    fields = l.split
+    (lower,upper) = fields[0].split("-")
+    mem = Integer("0x"+upper)-Integer("0x"+lower)
+    libname = fields[5]||"[unknown]"
+    [libname,mem]
+  end.inject({}) do |usage,(libname,mem)|
+    usage[libname] ||= 0
+    usage[libname] += mem
+    usage["[TOTAL]"] ||= 0
+    usage["[TOTAL]"] += mem
+    usage
+  end.to_a.sort_by{|(libname,mem)|mem}.each do |(libname,mem)|
+    puts "#{libname}: #{mem}"
+  end
+end

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec x64 /home/olaf/c64/games/giana.start.vsf

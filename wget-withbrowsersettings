@@ -1,0 +1,9 @@
+#! /bin/sh
+
+update_cookiestxts
+
+# Galeon
+# wget --load-cookies ~/.galeon/mozilla/galeon/cookies.txt "$@"
+
+# Firefox
+wget --header='User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9) Gecko/2008061602 Iceweasel/3.0 (Debian-3.0~rc2-1)' --load-cookies "`find ~/.firefox/ ~/.mozilla -name cookies.txt -printf '%C@ %p\n' | sort | tail -1 | awk '{print $2}'`" "$@"

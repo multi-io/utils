@@ -1,0 +1,49 @@
+tick
+----
+
+Mar 19 14:10:43 tick pppd[21324]: No response to 3 echo-requests
+Mar 19 14:10:43 tick pppd[21324]: Serial link appears to be disconnected.
+Mar 19 14:10:44 tick pppd[21324]: Modem hangup
+Mar 19 14:10:44 tick pppd[21324]: Connection terminated.
+Mar 19 14:10:44 tick pppd[21324]: Connect time 304.5 minutes.
+Mar 19 14:10:44 tick pppd[21324]: Sent 201587092 bytes, received 265725702 bytes.
+Mar 19 14:10:44 tick pppd[21324]: Exit.
+Mar 19 14:10:49 tick pppd[23418]: pppd 2.4.2 started by root, uid 0
+Mar 19 14:10:49 tick pppd[23418]: Using interface ppp0
+Mar 19 14:10:49 tick pppd[23418]: Connect: ppp0 <--> /dev/ttyp0
+Mar 19 14:10:50 tick pppd[23418]: CHAP authentication succeeded
+Mar 19 14:10:50 tick pppd[23418]: local  IP address 213.23.148.240
+Mar 19 14:10:50 tick pppd[23418]: remote IP address 145.253.4.144
+Mar 19 14:10:50 tick pppd[23418]: primary   DNS address 195.50.140.252
+Mar 19 14:10:50 tick pppd[23418]: secondary DNS address 195.50.140.250
+
+
+
+Sat 19 Mar 2005 02:11:30 PM CET: DSL IP change detected: 82.82.88.26 -> 213.23.148.240. Killing VPN
+Sat 19 Mar 2005 02:11:31 PM CET: waiting 800 sec. for remote side to re-establish the VPN...
+Sat 19 Mar 2005 02:24:51 PM CET: assuming VPN has been re-established. Setting up routes...
+/root/bin/routes.sh: no VPN interface running
+
+
+
+swangoose  (Uhrzeit um +48s angepasst -- siehe time-difference.txt)
+-------------------------------------------------------------------
+
+Sat Mar 19 14:25:36 2005: remote IP change detected: 82.82.88.26 -> 213.23.148.240
+Sat Mar 19 14:25:36 2005: tearing down tunnel to 82.82.88.26...
+Stopping vpn to 82.82.88.26: 
+disconnected.
+Sat Mar 19 14:25:36 2005: DONE tearing down tunnel to 82.82.88.26.
+Sat Mar 19 14:25:36 2005: waiting 120 sec for remote side to kill its VPN interface
+Killed by signal 15.
+Sat Mar 19 14:27:36 2005: setting up tunnel to 213.23.148.240...
+Starting vpn to 213.23.148.240: 
+Using interface ppp0
+Connect: ppp0 <--> /dev/pts/3
+Deflate (15) compression enabled
+local  IP address 192.168.3.2
+remote IP address 192.168.3.1
+connected.
+Sat Mar 19 14:27:38 2005: PPP connection established, setting up routes...
+SIOCDELRT: No such process
+Sat Mar 19 14:27:38 2005: DONE setting up tunnel to 213.23.148.240.

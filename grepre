@@ -1,0 +1,18 @@
+#!/usr/bin/perl -w
+
+my $re = $ARGV[0];
+die "usage: grepre <perl regexp containing a capture buffer>\n"
+  unless defined($re);
+
+$re = eval { qr/$re/ };
+die "invalid regexp: $@" if $@;
+
+my $exitcode=1;
+while (<STDIN>) {
+    while (/$re/g) {
+        print "$1\n";
+        $exitcode=0;
+    }
+}
+
+exit $exitcode;

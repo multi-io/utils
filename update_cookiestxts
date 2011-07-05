@@ -1,0 +1,23 @@
+#!/usr/bin/ruby -w
+
+require 'rubygems'
+require 'find'
+require 'dbi'
+
+["#{ENV['HOME']}/.mozilla/", "#{ENV['HOME']}/.firefox/", "#{ENV['HOME']}/.songbird2/"].each do |dirname|
+  next unless FileTest.exists?(dirname)
+  Find.find(dirname) do |fn|
+    if File.file?(fn) and "cookies.sqlite"==File.basename(fn)
+      # puts "#{fn} => #{File.dirname(fn)}/cookies.txt"
+      outfn = "#{File.dirname(fn)}/cookies.txt"
+      if !(FileTest.exists? outfn) or (File.mtime(fn) > File.mtime(outfn))
+        con = DBI.connect("dbi:SQLite3:#{fn}")
+        File.open(outfn,"w") do |outfile|
+          con.select_all("SELECT host, path, isSecure, expiry, name, value FROM moz_cookies").each do |(host,path,isSecure,expiry,name,value)|
+            outfile.puts "#{host}\tTRUE\t#{path}\t#{isSecure=='0' ? 'TRUE' : 'FALSE'}\t#{expiry}\t#{name}\t#{value}"
+          end
+        end
+      end
+    end
+  end
+end

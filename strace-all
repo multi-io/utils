@@ -1,0 +1,19 @@
+#!/bin/sh
+
+while getopts u: name; do
+  if [ "$name"="u" ]; then 
+    user=$OPTARG
+  fi
+done
+
+shift $[ $OPTIND - 1 ]
+proc=$1
+
+if [ -z "$proc" ]; then
+  echo "usage: strace-all [-u user] processname" >&2
+  exit 1
+fi
+
+# echo user: $user process: $proc
+
+ps axfu | grep "$proc" | grep "$user" | grep -v grep | awk '{print $2}' | xargs -i /bin/sh -c 'xterm -T {} -e strace -f -p {} &'

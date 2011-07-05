@@ -1,0 +1,4 @@
+#!/bin/sh
+
+exec xterm  -geometry 206x73--7--9
+ 

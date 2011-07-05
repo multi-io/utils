@@ -1,0 +1,7 @@
+#!/bin/sh
+
+for f in `listexecs`; do
+	if ldd $f | grep $1 >/dev/null; then
+	echo $f;
+	fi
+done

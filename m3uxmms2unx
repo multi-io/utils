@@ -1,0 +1,20 @@
+#!/usr/bin/perl -w
+
+die <<EOF
+usage: m3uxmms2unx <leading path> ...
+
+  expect .m3u file on stdin. Write to
+  stdout that file, minus comment lines (^#.*)
+  and path name prefixes equal to any of the
+  <leading path>s.
+EOF
+  unless defined(@ARGV);
+
+my $re = '(' . join '|', @ARGV . ')';
+
+while (<STDIN>) {
+    unless (/^\s*\#/) {
+        s!^/usr/local/mp3s/|/usr/local/ntbackup/mp3s/!!;
+        print;
+    }
+}

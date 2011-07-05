@@ -1,0 +1,6 @@
+#!/bin/sh
+
+TMP=`mktemp /tmp/gnuplot-eps-and-wait.XXXXXXXXXX` || exit 1
+(echo 'set terminal postscript eps'; cat ) | gnuplot >$TMP
+gv $TMP
+rm -f $TMP

@@ -1,0 +1,22 @@
+#!/bin/sh
+
+#if [ -z "$DVDR_DEVICE" ]; then
+#    DVDR_DEVICE="`getdvdrdev`";
+#fi
+
+#mkisofs -f -J "$1" | dvdrecord -v -speed=1 dev="$DVDR_DEVICE" -dao -data -
+
+speed=2
+
+while getopts 's:' OPTNAME; do
+case "$OPTNAME" in
+  "s")
+    speed="$OPTARG" ;;
+  "?")
+    exit 1;;
+esac
+done
+
+shift $(($OPTIND - 1))
+
+growisofs -Z /dev/cdrw -speed="$speed" -R "$1"

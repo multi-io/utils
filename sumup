@@ -1,0 +1,12 @@
+#!/bin/sh
+
+sum=0
+
+for size in `xargs`;
+do
+    sum=$[ $sum + $size ]
+done
+
+echo $sum
+
+

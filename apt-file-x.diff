@@ -1,0 +1,37 @@
+--- apt-file-2.0.3-5	2004-03-14 23:46:05.000000000 +0100
++++ apt-file	2004-03-14 12:23:20.000000000 +0100
+@@ -179,7 +179,8 @@
+     my ($pack, $file);
+     debug "regexp: $pattern";
+     $|=1;
+-    my $regexp = $Conf->{ignore_case} ? qr/$pattern/i : qr/$pattern/;
++    my $regexp = eval { $Conf->{ignore_case} ? qr/$pattern/i : qr/$pattern/ };
++    error($@) if $@;
+     foreach(@$data) {
+ 	my $file = "$Conf->{cache}/$_->{dest}";
+ 	next if (! -f $file);
+@@ -271,6 +272,7 @@
+     --package-only	-l		Only display packages name
+     --fixed-string	-F		Do not expand pattern
+     --ignore-case	-i		Ignore case distinctions
++    --regexp		-x		pattern is a regular expression
+     --verbose		-v		run in verbose mode
+     --dummy		-y		run in dummy mode (no action)
+     --help		-h		Show this help.
+@@ -294,6 +296,7 @@
+ 		   "cdrom-mount|d=s" => \$Conf->{cdrom_mount},
+ 		   "verbose|v" => \$Conf->{verbose},
+ 		   "ignore-case|i" => \$Conf->{ignore_case},
++		   "regexp|x" => \$Conf->{is_regexp},
+ 		   "dummy|y" => \$Conf->{dummy},
+ 		   "package-only|l" => \$Conf->{package_only},
+ 		   "fixed-string|F" => \$Conf->{fixed_strings},
+@@ -332,7 +335,7 @@
+     $Conf->{pattern} = shift @ARGV;
+     if(defined $Conf->{pattern}) {
+ 	$Conf->{pattern} =~ s/^\///;
+-	$Conf->{pattern} = quotemeta($Conf->{pattern});
++	$Conf->{pattern} = quotemeta($Conf->{pattern}) unless $Conf->{is_regexp};
+     }
+     undef $!;
+ 

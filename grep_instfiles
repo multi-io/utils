@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+
+my %openfiles;
+
+while (<STDIN>) {
+    SWITCH: {
+        if(/^\S+\s+f?open(?:64)?\s+(\S+)\s+(#success)/) {
+            $openfiles{$1} = 1; last SWITCH;
+        }
+        if(/^\S+\s+unlink\s+(\S+)\s+(#success)/) {
+            delete $openfiles{$1}; last SWITCH;
+	}
+        if(/^\S+\s+rename\s+(\S+)\s+(\S+)\s(#success)/) {
+            delete $openfiles{$1};
+            $openfiles{$2} = 1;
+	    last SWITCH;
+	}
+    }
+}
+
+
+for my $f (keys %openfiles) {
+    print "$f\n";
+}

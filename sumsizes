@@ -1,0 +1,3 @@
+#!/bin/sh
+
+xargs -d '\n' du  | cut -f1 | sumup

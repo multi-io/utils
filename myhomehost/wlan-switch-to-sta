@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e
+
+/etc/init.d/hostapd stop
+ifconfig ath0 down
+wlanconfig ath0 destroy
+wlanconfig ath0 create wlandev wifi0 wlanmode sta
+ifconfig ath0 up

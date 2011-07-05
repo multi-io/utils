@@ -1,0 +1,18 @@
+#!/bin/sh
+
+if [ $# != 0 ] && ( [ $1 = '-h' ] || [ $1 = '--help' ] ); then
+    echo "Aufruf: myhexdump [-no] [file ...]
+file oder stdin als hexdump ausgeben (16 Bytes pro Zeile, ganz links Offset,
+dann Hexbytes, dann ASCII).
+Falls -no angegeben wird, Offset weglassen."
+    exit
+fi
+
+SHOW_OFFSET=yes
+if [ "$1" = "-no" ]; then
+    SHOW_OFFSET=
+    shift
+fi
+
+hexdump -v ${SHOW_OFFSET:+-e '"%07.7_ax  "'} -e '16/1 "%02x "' -e '"   "' -e '16/1 "%_p"' -e '"\n"' $*
+

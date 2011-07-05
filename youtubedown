@@ -1,0 +1,141 @@
+#!/usr/bin/perl -w
+# Copyright © 2007, 2008 Jamie Zawinski <jwz@jwz.org>
+#
+# Permission to use, copy, modify, distribute, and sell this software and its
+# documentation for any purpose is hereby granted without fee, provided that
+# the above copyright notice appear in all copies and that both that
+# copyright notice and this permission notice appear in supporting
+# documentation.  No representations are made about the suitability of this
+# software for any purpose.  It is provided "as is" without express or 
+# implied warranty.
+#
+# Given a YouTube URL, downloads the corresponding FLV file.
+# The name of the file will be the <TITLE> of the YouTube page.
+#
+# Created: 25-Apr-2007.
+
+require 5;
+use diagnostics;
+use strict;
+
+my $progname = $0; $progname =~ s@.*/@@g;
+my $version = q{ $Revision: 1.1 $ }; $version =~ s/^[^0-9]+([0-9.]+).*$/$1/;
+
+my $verbose = 1;
+
+sub de_entify($) {
+  my ($text) = @_;
+  $text =~ s/&uuml;/u/g;
+  $text =~ s/&lt;/</g;
+  $text =~ s/&gt;/>/g;
+  $text =~ s/&amp;/&/g;
+  return $text;
+}
+
+sub safe_system(@) {
+  my (@cmd) = @_;
+
+  print STDOUT "$progname: executing " . join(' ', @cmd) . "\n"
+    if ($verbose > 3);
+
+  system @cmd;
+  my $exit_value  = $? >> 8;
+  my $signal_num  = $? & 127;
+  my $dumped_core = $? & 128;
+  error ("$cmd[0]: core dumped!") if ($dumped_core);
+  error ("$cmd[0]: signal $signal_num!") if ($signal_num);
+  error ("$cmd[0]: exited with $exit_value!") if ($exit_value);
+}
+
+
+sub download_url($) {
+  my ($url) = @_;
+
+  # Adding fmt=18 means "give us a higher res video if available".
+  $url .= "&fmt=18" unless ($url =~ m/&fmt=/);
+
+  my ($id) = ($url =~ m@^http://www\.youtube\.com/watch\?v=([^<>?&,]+)($|&)@);
+  error ("no ID in $url") unless ($id);
+
+  my $body = `wget -qO- '$url'`;
+  error ("unable to get $url") unless (length($body) > 5000);
+
+  my ($title) = ($body =~ m@<title>\s*(.*?)\s*</title>@si);
+  $title =~ s/^Youtube - //si;
+
+  my $file = "$title.flv";
+  $file = de_entify($file);
+
+  if ($body =~ m@<div class="errorBox">\s*(.*?)\s*</div>@si) {
+    print STDERR "error: $file: \"$1\"\n";
+    return;
+  }
+
+#  my ($args) = ($body =~ m@/player2.swf(\?[^/"]*?video_id=$id\&[^"]+)"@s);
+  my ($args) = ($body =~ m@swfArgs = {(.*?)}@s);
+
+  if (!$args &&
+      $body =~ m@may contain content that is (inappropriate)@) {
+    print STDERR "error: $file: \"$1\"\n";
+    return;
+  }
+
+# print STDERR "####\n$body\n####\n\n" unless ($args);
+
+  error ("unable to find args in $url") unless ($args);
+
+  # hl:'en',video_id:'CjGi-1FHq8Y',l:'207',etc
+  # becomes:
+  # hl=en&video_id=CjGi-1FHq8Y&l=207& etc
+
+  # "hl": "en", "plid": "AAR..."
+  # becomes:
+  # hl=en&plid=AAR...
+
+  $args =~ s/[\'\"]?, *[\'\"]?/&/gs;
+  $args =~ s/[\'\"]?: *[\'\"]?/=/gs;
+  $args =~ s/[\'\"] *$//s;
+  $args =~ s/^[\'\"] *//s;
+
+  error ("unparsable args: $args") if ($args =~ m/[\s\'\"]/);
+
+  $url = 'http://www.youtube.com/get_video?' . $args;
+
+  print STDERR "$progname: downloading \"$file\"\n" if ($verbose);
+  my @cmd = ("wget", "-O", $file, $url);
+  push @cmd, "-q" if ($verbose <= 2);
+  safe_system (@cmd);
+}
+
+
+sub error($) {
+  my ($err) = @_;
+  print STDERR "$progname: $err\n";
+  exit 1;
+}
+
+sub usage() {
+  print STDERR "usage: $progname [--verbose] youtube-urls...\n";
+  exit 1;
+}
+
+sub main() {
+  my @urls = ();
+  while ($#ARGV >= 0) {
+    $_ = shift @ARGV;
+    if ($_ eq "--verbose") { $verbose++; }
+    elsif (m/^-v+$/) { $verbose += length($_)-1; }
+    elsif (m/^-./) { usage; }
+    elsif (! m@^http://www\.youtube\.com/@s ) { 
+      print STDERR "$progname: not a www.youtube.com url: $_\n";
+      usage; }
+    else { push @urls, $_; }
+  }
+  usage unless ($#urls >= 0);
+  foreach (@urls) {
+    download_url ($_); 
+  }
+}
+
+main();
+exit 0;

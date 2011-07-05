@@ -1,0 +1,10 @@
+#!/bin/sh
+
+encrfile="$1"
+if [ -z "$encrfile" ]; then
+    echo "usage: `basename $0` <encrfile>";
+    exit 1;
+fi
+
+echo "decrypting..." >&2 &&
+gpg --decrypt "$encrfile"

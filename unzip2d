@@ -1,0 +1,6 @@
+#!/bin/sh
+
+for f in "$@"; do
+    mkdir "$f.d" &&
+    (cd "$f.d" && unzip "../`basename $f`";)
+done

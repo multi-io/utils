@@ -1,0 +1,15 @@
+#!/bin/sh
+
+tmpfile=`mktemp`
+
+while true; do
+  echo 'processes with potentially dangerous internet connections:' >$tmpfile
+  /usr/local/bin/show-spurious-listeners >>$tmpfile
+
+  case $? in
+  0) wall <$tmpfile;;
+  2) exit 1;;
+  esac
+
+  sleep 120
+done

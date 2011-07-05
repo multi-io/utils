@@ -1,0 +1,21 @@
+#!/usr/bin/perl -w
+
+my ($host, $user, $password) =
+    (`cat ~/.authinfo` =~ /machine\s+(.*?)\s+login\s+(.*?)\s+password\s+(.*)/)
+      or die "unable to read ~/.authinfo: $! $@";
+
+use Net::IMAP::Simple;
+
+my $server = new Net::IMAP::Simple( $host ) or die "error: $@";
+# $server->Debug(1);
+$server->login( $user, $password ) or die "error: $@";
+
+for my $folder ('INBOX', 'INBOX.spam') {
+    my $nmsgs = $server->select($folder);
+    for my $i (1..$nmsgs) {
+        if (grep {/^X-Spam-Status: Yes/ or /^X-Virus: YES/} @{$server->get($i)}) {
+            print "deleting: $folder/$i\n";
+            $server->delete($i);
+        }
+    }
+}

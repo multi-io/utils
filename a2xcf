@@ -1,0 +1,26 @@
+#!/bin/sh
+
+while getopts 'o:' OPTNAME; do
+    case "$OPTNAME" in
+        "o")
+            outfile="$OPTARG" ;;
+        "?")
+            exit 1;;
+    esac
+done
+
+shift $(($OPTIND - 1))
+
+for infile in "$@"; do
+    if [ -z "$outfile" ]; then
+        outfile=${infile%.*}.xcf;
+    fi
+    # TODO: not white-space safe. Didn't find a goddamn way to pass arguments to the scheme code,
+    #  and you don't really want to do the filename iteration/globbing in the scheme code
+    gimp --no-interface --no-data --batch \
+        "(let*
+             ((image (car (gimp-file-load RUN-NONINTERACTIVE \"$infile\" \"$infile\")))
+              (actlayer (car (gimp-image-get-active-layer image))))
+           (gimp-file-save RUN-NONINTERACTIVE image actlayer \"$outfile\" \"$outfile\"))" \
+         --batch '(gimp-quit TRUE)'
+done

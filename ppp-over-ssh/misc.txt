@@ -1,0 +1,61 @@
+Def.: t_newIP: Zeitpunkt des Erhalts der neuen IP
+
+      (t0...t1) zeitintervall von t0 bis t1
+
+      int + t (mit "int" - Z.Intervall, "t"-Zeit): Zeitintervall
+                                      (Start(int)+t...Stop(int)+t)
+
+auf tick:
+
+(Ziel: Nach Erhalt neuer IP muss Verbindung gekillt werden, bevor
+swangoose versucht, das VPN neu aufzubauen)
+
+
+while true; do
+
+  falls neue IP:
+    kill-vpn
+    sleep 1400
+    routen zum ISST neu aufbauen
+  end
+
+  sleep 60
+
+done
+
+&
+
+while true; do
+
+  publish-ip
+
+  sleep 600
+
+done
+
+
+
+=> vpn gekillt (t_newIP...t_newIP+60s) + Laufzeit(kill-vpn)
+
+   Neuaufbau der Routen (t_newIP+1400s...t_newIP+1460s) + Laufzeit(kill-vpn)
+
+
+
+auf swangoose:
+
+
+while true; do
+
+  get_ip  # die oben gepublishte
+
+  wenn neu:
+    sleep 120   # kill-vpn auf tick abwarten
+    vpn neu aufbauen
+  end
+
+  sleep 610
+
+done
+
+
+=> vpn neu aufgebaut (t_newIP+120s...t_newIP+1330s) + Laufzeit(vpn neu aufbauen)

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+while true; do
+  echo `date +%s; ps -p "$1" ho rss,size,vsz`
+  sleep 30
+done

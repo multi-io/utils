@@ -1,0 +1,7 @@
+#!/bin/sh
+# in: URL of an index page on cmdline
+# out: all articles in that page's forum/"Beitragsübersicht",
+#      including subject, time, author, msgid, and body, as plain
+#      text, encoded in ISO latin1
+
+fetchheise-idxpage-all-articleurls "${1:?usage: $0 <url>}" | fetchheise-fetcharticles

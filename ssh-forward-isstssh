@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ssh -nN -L 2222:deer.isst.fhg.de:22 butterfly.cs.tu-berlin.de sleep 86400

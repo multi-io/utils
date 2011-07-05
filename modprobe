@@ -1,0 +1,12 @@
+#!/usr/bin/perl -w
+
+use Sys::Syslog;
+
+eval {
+    openlog("modprobe wrapper", "pid,ndelay", "LOG_USER");
+    syslog(LOG_DEBUG, "running: modprobe " . join(" ",@ARGV) . "  --- MODPROBE_OPTIONS=" . $ENV{"MODPROBE_OPTIONS"});
+    closelog;
+};
+
+exec {"/sbin/modprobe-wrapped/modprobe"} "/sbin/modprobe", @ARGV;
+die "error: $!";

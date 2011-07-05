@@ -1,0 +1,3 @@
+#!/bin/sh
+
+deb-xtract-uris | xargs -l ncftpget

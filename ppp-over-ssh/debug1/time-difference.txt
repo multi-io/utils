@@ -1,0 +1,5 @@
+[root@tick ~]# date
+Sat Mar 19 16:44:43 CET 2005
+
+swangoose:~# date
+Sat Mar 19 16:43:55 CET 2005

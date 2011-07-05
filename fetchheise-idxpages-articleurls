@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+# in: URLs of one or more index pages on cmdline
+# out: URLs of all articles referenced in those pages on stdout, one per line
+
+use URI;
+
+foreach $url (@ARGV) {
+    # print "URL: $url\n";
+    open(WGET, "wget-withbrowsersettings -q -O- '$url' |") or die "couldn't run wget-withbrowsersettings: $!";
+    while(<WGET>) {
+        if (m!a href="/(.*?/read/)"!gi) {
+            print "http://www.heise.de/$1\n";
+        };
+    }
+    close(WGET);
+}
+
+# TODO: optionally extract date/time and author name of each article
+# TODO: generally, one would want to pipe sequences of real "article
+#       records" with slots like "date", "author", "contents" (only
+#       some of which may have to be filled) etc. between the
+#       fetchheise-* processes instead of line-oriented URL lists
+#
+#       As a more limited solution, we could output the pieces of
+#       article data on one line, separated by TAB characters. Or use
+#       a page-oriented output (pages separated by \f)

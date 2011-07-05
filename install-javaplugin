@@ -1,0 +1,17 @@
+#!/bin/sh
+#adapted from "update-flashplugin"
+
+# TODO: list orderd by priority...
+srcdir=/usr/local/jdk/jre/plugin/i386/ns610-gcc32
+
+cd "$srcdir" || { echo "couldn't cd to $srcdir"; exit 1; }
+f="`echo $srcdir/libjavaplugin*.so`";
+[ -z "$f" ] && { echo "no libjavaplugin... in $srcdir"; exit 1; }
+
+echo "found file: $f";
+
+for destdir in /usr/lib/mozilla/plugins /usr/lib/mozilla-snapshot/plugins /usr/lib/mozilla-firebird/plugins /usr/lib/mozilla-firefox/plugins; do
+    mkdir --parents "$destdir";
+    rm -f "$destdir/libjavaplugin*.so";
+    ln -sf "$f" "$destdir/`basename $f`";
+done

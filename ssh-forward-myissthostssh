@@ -1,0 +1,5 @@
+#!/bin/sh
+# run ssh-forward-isstssh first!
+
+ssh -nN -L 5143:swangoose.isst.fhg.de:22 isstunixhost sleep 86400
+#ssh -n -l oklischa -i ~/.ssh/identity.pphr -L 5143:swangoose.isst.fhg.de:22 -p 2222 localhost     

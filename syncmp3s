@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# TODO: sync removals?
+
+targetdir="$1"
+if [ -z "$targetdir" ]; then
+    echo "usage: $0 <targetdir>"
+    exit 1
+fi
+
+find . -type f -name '*mp3' |
+while read f; do
+    echo "copying: $f"
+    cp -n --parents "$f" "$targetdir/";
+done

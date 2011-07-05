@@ -1,0 +1,4 @@
+#!/bin/sh
+
+TMP=`mktemp /tmp/gnuplot-eps-and-wait.XXXXXXXXXX` || exit 1
+(echo 'set terminal png'; cat ) | gnuplot

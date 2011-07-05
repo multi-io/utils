@@ -1,0 +1,19 @@
+#!/bin/sh
+
+myname="`basename $0`"
+
+FFPID="`ps axu | grep firefox | grep -v grep | grep -v "$myname" | grep $USER | head -1 | awk '{print $2}'`"
+
+if [ -z "$FFPID" ]; then
+  echo "no running firefox instance found"
+  exit 1
+fi
+
+EXE="`ls -l /proc/$FFPID/exe | grepre '-> (.*)'`"
+
+if [ -z "$EXE" ]; then
+  echo "executable for firefox instance $FFPID not found"
+  exit 1
+fi
+
+gdb -x "`dirname $0`/firefox-print-stacktraces.gdbscript" "$EXE" "$FFPID"

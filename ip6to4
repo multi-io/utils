@@ -1,0 +1,10 @@
+#!/bin/sh
+# in: interface name on cmdline or ipv4 ip on stdin
+# out: prefix of 6to4 ipv6 ip of the input ip on stdout
+
+{ if [ $# = 1 ]; then
+    ifaceaddr "$1" | head -1
+  else
+    cat
+  fi
+} | printf '2002:%02x%02x:%02x%02x' `tr '.' ' '`

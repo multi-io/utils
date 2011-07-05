@@ -1,0 +1,3 @@
+#!/bin/sh
+
+gdb -d /usr/local/src/deb/source/gtk+2.0-2.2.1/build-tree/gtk+-2.2.1/gtk "$@"

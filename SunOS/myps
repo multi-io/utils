@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ps -A -o user,pid,ppid,s,pcpu,pmem,vsz,osz,rss,stime,etime,time,args

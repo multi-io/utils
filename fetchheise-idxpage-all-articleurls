@@ -1,0 +1,6 @@
+#!/bin/sh
+# in: URL of index page on cmdline
+# out: URLs of all articles in that forum/"Beitragsübersicht" on stdout,
+#      one URL per line
+
+fetchheise-idxpage-idxpageurls "${1:?usage: $0 <url>}" | xargs fetchheise-idxpages-articleurls

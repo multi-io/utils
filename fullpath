@@ -1,0 +1,17 @@
+#!/bin/sh
+
+RESULT=$1;
+
+if echo $RESULT | egrep -q '^\./'; then
+    RESULT=`echo $RESULT | sed 's/^\.\///'`;
+    RESULT="${PWD}/${RESULT}";
+fi
+
+if echo $RESULT | egrep -q '^/'; then
+    true;
+else
+    RESULT="${PWD}/${RESULT}";
+fi
+
+
+echo $RESULT;

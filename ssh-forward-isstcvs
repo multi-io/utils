@@ -1,0 +1,4 @@
+#!/bin/sh
+# run ssh-forward-isstssh first!
+
+ssh -nN -L 5142:panda.isst.fhg.de:2401 isstunixhost sleep 86400

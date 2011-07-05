@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+tick=`showhomeip`
+
+ssh -2 -N -L 4000:localhost:4000 $tick &  # telnet
+ssh -2 -N -L 4080:localhost:4080 $tick &  # web
+ssh -2 -N -L 4001:localhost:4001 $tick &  # gui
+ssh -2 -N -L 1213:localhost:1213 $tick &  # GiFT (?)

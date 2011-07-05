@@ -1,0 +1,18 @@
+#!/usr/bin/perl -w
+
+use constant MAXLENGTH => 64;
+
+use File::Find;
+
+my $exitcode=0;
+
+find({ no_chdir=>1,
+       wanted => sub {
+           return unless -f;
+           if (length $File::Find::name > MAXLENGTH+2) {
+               print STDERR "file path longer than ".MAXLENGTH." chars: $File::Find::name\n";
+               $exitcode = 1;
+           }
+       }}, '.');
+
+exit $exitcode;

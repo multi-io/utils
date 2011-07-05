@@ -1,0 +1,13 @@
+#!/bin/sh
+# export environment variables into a sawfish window manager
+# running on $DISPLAY. The variables are seen by programs
+# subsequently started from that sawfish instance
+
+if [ $# != 2 ]; then
+    echo "usage: $0 variable value" 1>&2;
+    exit 1;
+fi
+
+var="$1"; val="$2";
+
+sawfish-client -e "(setenv \"$var\" \"$val\")"

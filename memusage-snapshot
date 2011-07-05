@@ -1,0 +1,6 @@
+#!/bin/sh
+
+date +'TIME: %x %X (%s)'
+ps ax -o pid,size,vsz,comm --sort -size | head -20
+free
+cat /proc/loadavg

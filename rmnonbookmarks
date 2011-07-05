@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# pre: logged in as wwwoffled, `pwd`==/var/spool/wwwoffle/http,
+#      Galeon bookarks in /tmp/bookmarks.xbel, /tmp/bookmarks.ctd.xbel
+#
+# post: directories containing wwwoffle caches for all domains *not*
+#       present in any bookmarked URLs removed
+
+echo "TODO: *read* comments, comment out exit statement, use program as documented"
+exit 1;
+
+export PATH=/home/olaf/bin:$PATH
+
+bmdomains="`cat /tmp/bookmarks.xbel /tmp/bookmarks.ctd.xbel | grepre 'href="http://(.*?)[/"]' | sort | uniq`"
+
+#echo $bmdomains
+
+for f in *; do
+   if ! echo $bmdomains | grep -q "$f"; then rm -rf "$f"; fi
+done

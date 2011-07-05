@@ -1,0 +1,18 @@
+#!/bin/sh
+
+RESULT=
+for entry in `ps axh | sed 's/ \+/@/g' | sed 's/^@\+//g' | cut -d @ -f1,5`; do
+    PID=`echo $entry | cut -d @ -f1`;
+    NAME=`echo $entry | cut -d @ -f2`;
+    if [ "$1" = "$PID" -o -n "`echo $NAME | grep $1`" ]; then
+        RESULT=$PID;
+	break;
+    fi
+done
+
+if [ -n "$RESULT" ]; then
+    echo $RESULT
+else
+    echo getpid: no such PID or process name: $1 >&2
+    exit -1
+fi

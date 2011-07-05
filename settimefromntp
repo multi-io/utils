@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+
+my @known_timeservers = qw/
+                           #gips.nich.de
+                           times.zrz.tu-berlin.de
+                           slug.ctv.es
+                           time.kfki.hu
+                           ntp.lth.se
+                           ntp1.arnes.si
+                           ntp2.arnes.si
+                           ntp1.uk.uu.net
+			   /;
+
+
+for my $server (@known_timeservers) {
+    print "trying $server...\n";
+
+    my $child = fork();
+    die "couldn't fork(): $!" unless defined($child);
+
+    if ($child==0) {
+        my $cmd = "/usr/bin/rdate -s $server && /sbin/hwclock --systohc";
+        exec $cmd
+           or die "unable to exec(): $cmd: $!\n";
+    }
+
+    eval {
+        local $SIG{ALRM} = sub { die "timed_out" };
+        alarm 8;
+        waitpid($child,0);
+        alarm 0;
+        die "exited: $?";
+    };
+
+    if ($@ =~ /timed_out/) {
+        kill 'SIGTERM', $child;
+        print "timed out.\n";
+        next;
+    }
+
+    if ($@ =~ /exited: ([^\s]*)/ and $1 != 0) {
+        print "child exit status $1\n";
+        next;
+    }
+
+    exit 0;
+}
+
+print "gosh, no server worked...\n";
+exit 1;

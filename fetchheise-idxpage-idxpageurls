@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+# in: URL of index page on cmdline
+# out: URLs of all index pages in that forum/"Beitragsübersicht" on stdout,
+#      one URL per line
+
+use URI;
+
+$url=$ARGV[0] or die "usage: $0 <url>";
+
+#print $url,"\n";
+
+open(WGET, "wget-withbrowsersettings -q -O- '$url' |") or die "couldn't run wget-withbrowsersettings: $!";
+
+($hsmin,$hsmax)=(999999999,0);
+
+while(<WGET>) {
+    chomp;
+    foreach (m!a href="/(.*?)"!gi) {
+        ($prenew,$hs,$postnew) = m!^(.*?)hs-(.*?)([/$\&].*)!;
+        next unless defined($hs);
+        if (defined($pre) and (not($pre eq $prenew) or not($post eq $postnew))) {
+            print STDERR "$0: warning: found 'out-of-sequence' url: $_\n";
+            print URI->new_abs($_,$url)->as_string, "\n";
+        }
+        else {
+            ($pre,$post) = ($prenew,$postnew);
+            $hsmin=$hs if ($hs<$hsmin);
+            $hsmax=$hs if ($hs>$hsmax);
+        }
+    };
+}
+
+close(WGET);
+
+$hsmin=0 if ($hsmin==16);
+
+for ($hs=$hsmin; $hs<=$hsmax; $hs+=16) {
+    # print URI->new_abs("${pre}hs-${hs}${post}",$url)->as_string, "\n";
+    print "http://www.heise.de/${pre}hs-${hs}${post}\n";
+}

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# /sbin/ifconfig "$1" | grepre 'inet.* addr: *(.*?)[/ ]'  # apparently ifconfig sometimes doesn't display IPv6 addresses...
+
+ip addr show "$1" | grepre 'inet.*? +(.*?)[/ ]'
+ 

@@ -1,0 +1,33 @@
+#!/bin/sh
+# pre: - ppp0 up and connected to the IPv4 internet
+#
+#      - lanif up and connected to the local LAN
+#
+#
+# post: - tun6to4 up and connected to the IPv6 internet, with IPv6
+#         address = 2002:<ppp0's local IPv4 address>::1:2
+#
+#       - local LAN accessible via IPv6 over lanif, lanif's IPv6 address
+#         2002:<ppp0's local IPv4 address>::2:1, local LAN's network
+#         address 2002:<ppp0's local IPv4 address>::2:0/112. Local
+#         host forwards IPv6 between LAN and IPv6 internet
+
+set -e
+
+execlogged() {
+  echo "executing: $@" && eval "$@"
+
+}
+
+echo "setting up IPv6..."
+
+# set up ppp0
+execlogged ip tunnel add tun6to4 mode sit remote any local "`ifaceaddr ppp0`"
+execlogged ip link set dev tun6to4 up
+execlogged ip -6 addr add "`ip6to4 ppp0`::1:2" dev tun6to4
+execlogged ip -6 route add 2000::/3 via ::192.88.99.1 dev tun6to4 metric 1
+
+# set up LAN
+execlogged ip -6 addr add "`ip6to4 ppp0`::2:1" dev lanif
+execlogged ip -6 route add "`ip6to4 ppp0`::2:0/112" dev lanif
+execlogged 'echo 1 >/proc/sys/net/ipv6/conf/all/forwarding'

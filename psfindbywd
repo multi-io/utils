@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ls -l /proc/*/cwd | grep "$1" | grepre '/proc/(.*?)/' | xargs -i sh -c 'echo -n "{}   "; cat /proc/{}/cmdline; echo'

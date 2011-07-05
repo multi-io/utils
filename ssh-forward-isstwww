@@ -1,0 +1,4 @@
+#!/bin/sh
+# run ssh-forward-isstssh first!
+
+ssh -N -L 5144:www.isst.fhg.de:80 isstunixhost

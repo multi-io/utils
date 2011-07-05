@@ -1,0 +1,102 @@
+#!/usr/bin/perl -w
+
+sub log_msg($) {
+    my $text = shift;
+    print STDERR localtime() . ": ${text}\n";
+}
+
+
+sub get_ip_and_age {
+    my @remote_hosts = qw{basta.cs.tu-berlin.de
+                          butterfly.cs.tu-berlin.de
+                          conde.cs.tu-berlin.de};
+    my $remote_ipaddrfile = '/home/k/klischat/ipaddress.txt';
+
+    local $/=undef;
+    foreach my $host (@remote_hosts) {
+        # open(SSH, qq{ssh $host 'printf "ip: "; cat $remote_ipaddrfile; stat $remote_ipaddrfile' |});
+        #open(SSH, qq{ssh $host 'printf ip:; cat $remote_ipaddrfile; stat $remote_ipaddrfile' |});
+        open(SSH, qq{su - olaf -c "ssh $host 'printf ip:; cat $remote_ipaddrfile; stat $remote_ipaddrfile'" |});
+
+        my $ssh = <SSH>;
+        close SSH;
+
+        my ($ip, $age) = $ssh =~ m!ip:(.*?)\n.*?Modify:.*?\((.*?)\)!si;
+        if ($ip) {
+            my ($days,$hrs,$mins,$secs) = $age=~/(.*?)\.(.*?):(.*?):(.*)/;
+            $age = $secs+$mins*60+$hrs*3600+$days*3600*24;
+            return ($ip,$age);
+        }
+    }
+    die "unparseable ip/age";
+}
+
+
+
+{
+    my $running = 0;
+
+    sub setup_tunnel($) {
+        return if $running;
+
+        my $remoteip = shift;
+        log_msg "setting up tunnel to $remoteip...";
+
+        system("/usr/local/sbin/run-ppp-over-ssh $remoteip start") and
+            die "couldn't exec run-ppp-over-ssh $remoteip: $!";
+        system("ssh $remoteip /usr/local/sbin/myhomehost/isstsshvpn-routes");
+
+        log_msg "PPP connection established, setting up routes...";
+        system <<EOS and die "error setting up local routes: $!";
+        /sbin/route del -net 192.168.0.0 netmask 255.255.255.0 dev ppp0;
+        /sbin/route add -net 192.168.0.0 netmask 255.255.255.0 dev ppp0;
+EOS
+
+        $running = 1;
+        log_msg "DONE setting up tunnel to $remoteip.";
+    }
+
+
+    sub teardown_tunnel($) {
+        return unless $running;
+        my $oldip = shift;
+        log_msg "tearing down tunnel to $oldip...";
+        system("/usr/local/sbin/run-ppp-over-ssh $oldip stop");
+        $running = 0;
+        log_msg "DONE tearing down tunnel to $oldip.";
+    }
+}
+
+
+my $interrupted = 0;
+$SIG{INT} = sub { $interrupted = 1; };
+
+my $oldip = "";
+my ($ip,$age) = get_ip_and_age();
+while (1) {
+    if ($age > 650) {
+        log_msg "last remote IP change $age secs ago; assuming remote side is down";
+        teardown_tunnel($ip);
+        $ip = "";
+    }
+    elsif ($oldip ne $ip) {
+        log_msg "remote IP change detected: $oldip -> $ip";
+        teardown_tunnel($oldip);
+        log_msg "waiting 120 sec for remote side to kill its VPN interface";
+        sleep 120;
+        if ($interrupted) {
+            log_msg "interrupted.";
+            exit(0);
+        }
+        setup_tunnel($ip);
+    }
+
+    sleep 610;
+    if ($interrupted) {
+        log_msg "interrupted.";
+        teardown_tunnel($oldip);
+        exit(0);
+    }
+    $oldip = $ip;
+    ($ip,$age) = get_ip_and_age();
+}

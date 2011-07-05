@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+/etc/init.d/hostapd stop
+ifconfig ath0 down
+wlanconfig ath0 destroy
+
+sleep 5
+
+wlanconfig ath0 create wlandev wifi0 wlanmode ap
+ifconfig ath0 up
+brctl addif lanif ath0
+sleep 2
+/etc/init.d/hostapd start
+
+# TODO: wenn im Syslog was von "lanif: port 2(ath0) entering disabled state" steht, hilft
+#   es wohl, hostapd nochmal zu stoppen und zu starten??
+

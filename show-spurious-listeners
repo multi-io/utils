@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+
+open(NETSTAT, "netstat -tulpen |") or do { print STDERR "couldn't run netstat -tulpen: $!\n" ; exit 2; };
+#open(NETSTAT, "<nt.txt") or die "couldn't run netstat -tulpen: $!" ;
+
+# default config
+our @safe_local_ips = qw/127.0.0.1 192.168.0.1 192.168.0.2 192.168.3.1 192.168.3.2/;
+our @safe_local_ports = (0..1024,5900..6100);
+our @safe_progs = qw/mlnet/;
+
+do "/etc/spurious-listeners.conf";
+
+my $exitcode=1;
+while (<NETSTAT>) {
+    my ($prot,$lip,$lpt,$rip,$rpt,$state,$user,$inode,$pid,$pgname) =
+        m!^(.*?)\s+.*?\s+.*?\s+(.*?):([^:]*?)\s+(.*?):([^:]*?)\s+(.*?)\s+(.*?)\s+(.*?)\s+(.*?)/(.*)! or next;
+    $pgname =~ s/\s*$//;
+
+    next if grep {$_ == $lpt} @safe_local_ports
+               or grep {$_ eq $pgname} @safe_progs
+               or grep {$_ eq $lip} @safe_local_ips;
+
+    print;
+    $exitcode=0;
+}
+close(NETSTAT);
+
+exit $exitcode;

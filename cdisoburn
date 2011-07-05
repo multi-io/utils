@@ -1,0 +1,26 @@
+#!/bin/sh
+
+speed=4
+
+while getopts 's:' OPTNAME; do
+case "$OPTNAME" in
+  "s")
+    speed="$OPTARG" ;;
+  "?")
+    exit 1;;
+esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ -z "$CDR_DEVICE" ]; then
+    CDR_DEVICE="`getcdrdev`";
+fi
+
+if [ -z "$1" ]; then
+    file="-";
+else
+    file="$1";
+fi
+
+cdrecord -v -speed=4 dev="$CDR_DEVICE" -data "$file"

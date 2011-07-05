@@ -1,0 +1,15 @@
+#!/bin/sh
+# vorher (als root):
+#  eval `ssh-agent -s`
+#  ssh-add ~/.ssh/id_dsa
+
+while true; do
+    if [ -f /var/run/ppp0.pid ]; then
+        echo "ppp0 still up (PID `cat /var/run/ppp0.pid`). Killing it."
+        kill `cat /var/run/ppp0.pid`;
+    fi
+    echo "starting run-sofdsshvpn..."
+    /usr/local/sbin/mysofdhost/run-sofdsshvpn;
+    echo "run-sofdsshvpn has terminated unexpectedly. Sleeping 620 sec..."
+    sleep 620;
+done 2>&1 | tee -a /var/log/run-sofdsshvpn.log

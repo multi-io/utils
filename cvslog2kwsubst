@@ -1,0 +1,42 @@
+#!/usr/bin/perl -w
+
+
+my ($state,$rev,$date,$time,$author,$comment);
+
+$state=0;
+my $lineno=0;
+while (<>) {
+    ++$lineno;
+
+    if ($state==0 and (($rev) = /^revision (.*)$/)) {
+        $state=1; next;
+    }
+    if ($state==1) {
+        if (($date,$time,$author) = /date: (.*?) +(.*?); +author: (.*?);/) {
+            $comment=''; $state=2; next;
+        }
+        else {
+            die "${lineno}: parse error: expected ^date: xxxx/xx/xx xx:xx:xx;  author: xxxx;";
+        }
+    }
+    if ($state==2) {
+        if (/^-----------------------/ or /^=======================/) {
+            print "Revision $rev  $date $time  $author\n$comment\n";
+            $state=0; next;
+        }
+        else {
+            $comment .= $_;
+        }
+    }
+}
+
+#----------------------------
+#revision 1.17
+#date: 2003/06/09 10:00:14;  author: oklischa;  state: Exp;  lines: +12 -13
+#ContentMessageSlotExtractor als Implementation von
+#TagExpander. Übernimmt somit alle Daten, von denen eine Tag-Epansion
+#abhängen kann, inkl. bool isHTML.
+#----------------------------
+
+# Revision 1.20  2003/06/12 13:11:57  sbaatar
+# erweiterung.
