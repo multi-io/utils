@@ -29,6 +29,10 @@ while (1) {
     sleep $sleepTime;
     ($in1,$out1) = getInOut();
 
-    print "in: ", ($in1-$in0)/$sleepTime, " bytes/s, out: ", ($out1-$out0)/$sleepTime, " bytes/s\n";
+    if (defined $in0 and defined $in1 and defined $out0 and defined $out1) {
+        print "in: ", ($in1-$in0)/$sleepTime, " bytes/s, out: ", ($out1-$out0)/$sleepTime, " bytes/s\n";
+    } else {
+        print "[no data found for $iface]\n";
+    }
     ($in0,$out0) = ($in1,$out1);
 }
