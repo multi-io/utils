@@ -5,6 +5,7 @@ $|=1;   # autoflush stdout
 use Fcntl 'SEEK_SET';
 
 my $iface = $ARGV[0] || "eth0";
+my $sleepTime = $ARGV[1] || 5;
 
 print "transferrate on interface $iface:\n";
 
@@ -22,8 +23,6 @@ sub getInOut {
 my ($in0,$out0,$in1,$out1);
 
 ($in0,$out0) = getInOut();
-
-my $sleepTime=5;
 
 while (1) {
     sleep $sleepTime;
