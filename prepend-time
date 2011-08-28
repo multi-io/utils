@@ -1,0 +1,4 @@
+#!/usr/bin/perl -n
+
+print scalar(localtime()), ": $_";
+

@@ -109,6 +109,7 @@ mygdb \
 myhexdump \
 palm-fetchheise \
 pidof \
+prepend-time \
 pslibs.pl \
 quotelines \
 rfcidx.pl \
