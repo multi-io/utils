@@ -4,6 +4,8 @@
 # 
 # OUT: - lines with x y on stdout, containing a "moving average" of
 #        the input data
+#
+# hint: this program is now a special case of xy+-average; preferably use the latter instead
 
 $num = $ARGV[0] or die "usage: $0 <number of consecutive (x,y) pairs to average>";
 

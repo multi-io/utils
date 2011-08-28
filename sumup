@@ -1,12 +1,11 @@
-#!/bin/sh
+#!/usr/bin/perl -w
 
-sum=0
+$sum=0;
 
-for size in `xargs`;
-do
-    sum=$[ $sum + $size ]
-done
+while (<>) {
+    for my $num (split /\s+/) {
+        $sum += $num;
+    }
+}
 
-echo $sum
-
-
+print $sum, "\n";

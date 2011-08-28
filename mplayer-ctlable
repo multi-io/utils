@@ -18,6 +18,7 @@ while(1) {
         $cmd eq "playpause" and do { print MPLAYERFIFO " "; last; };
         $cmd eq "fullscreen" and do { print MPLAYERFIFO "f"; last; };
         $cmd eq "quit" and do { print MPLAYERFIFO "q"; last LOOP; };
+        $cmd eq "subsvisibility" and do { print MPLAYERFIFO "v"; };
     }
 }
 
