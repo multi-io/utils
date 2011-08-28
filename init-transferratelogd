@@ -1,0 +1,31 @@
+#! /bin/sh
+set -e
+
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+case "$1" in
+  start)
+        echo -n "Starting transferratelogd"
+	start-stop-daemon --start --background --exec /usr/local/sbin/transferratelogd --pidfile /var/run/transferratelogd.pid --make-pidfile
+        echo "."
+	;;
+  stop)
+        echo -n "Stopping transferratelogd"
+	start-stop-daemon --stop --pidfile /var/run/transferratelogd.pid
+        echo "."
+	;;
+
+  restart)
+        echo -n "Restarting transferratelogd ("
+	$0 stop
+	sleep 1
+	$0 start
+	echo ")."
+	;;
+
+  *)
+	echo "Usage: /etc/init.d/transferratelogd {start|stop|restart}"
+	exit 1
+esac
+
+exit 0

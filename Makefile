@@ -183,6 +183,7 @@ GLOBALUSER=root
 SBINFILES=\
 memusagelogd \
 thermallogd \
+transferratelogd \
 run-ppp-over-ssh \
 myissthost/run-isstsshvpn \
 myissthost/run-isstsshvpn-continuously \
