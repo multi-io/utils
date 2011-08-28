@@ -1,4 +1,5 @@
 #!/usr/bin/perl -n
 
-print scalar(localtime()), ": $_";
+use IO::Handle;
+print scalar(localtime()), ": $_"; STDOUT->flush
 
