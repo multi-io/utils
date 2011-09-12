@@ -4,5 +4,7 @@ trap 'kill 0' EXIT
 
 exec >>/var/log/transferrate.log 2>&1
 
+export PATH="/usr/local/bin:$PATH"
+
 log-transferrate ppp0 20 | prepend-time
 
