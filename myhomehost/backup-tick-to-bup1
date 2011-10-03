@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -e
+
+cd "`dirname $0`"
+./backup-tick-to root@tack::/mnt/backup/tick/
+

@@ -189,6 +189,8 @@ myissthost/run-isstsshvpn \
 myissthost/run-isstsshvpn-continuously \
 mysofdhost/run-sofdsshvpn \
 mysofdhost/run-sofdsshvpn-continuously \
+myhomehost/backup-tick-to \
+myhomehost/backup-tick-to-bup1 \
 myhomehost/kill-vpn-continuously \
 myhomehost/isstsshvpn-routes \
 myhomehost/sofdsshvpn-routes \

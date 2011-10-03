@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -e
+
+to="$1"
+
+if [ -z "$to" ]; then
+  echo "usage: $0 [[<user>@]<host>::]<targetdir>";
+  exit 1;
+fi
+
+rdiff-backup \
+--exclude /proc \
+--exclude /sys \
+--exclude /tmp \
+--exclude /swapfile1 \
+--exclude /var/cache/p2p \
+--exclude /var/cache/approx \
+--exclude /usr/local/tmp/freenet \
+/ \
+"$to"
+
