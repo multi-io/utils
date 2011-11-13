@@ -173,7 +173,8 @@ myhomedesktop/emacs_or_fallback.sh \
 make-misc \
 misc.make \
 lesscat \
-strace-all
+strace-all \
+zipjavasources
 
 #GLOBALTARGET=$(HOME)/bin
 GLOBALTARGET=/usr/local/bin
