@@ -7,9 +7,9 @@ while [ -n "$addr" ]; do
     addr="`ifaceaddr lanif | egrep '^2002' | head -1`"
 done
 
-route="`route -6 | awk '/^2002/ {print $1}' | head -1`"
+route="`ip -6 route | awk '/^2002/ {print $1}' | head -1`"
 while [ -n "$route" ]; do
     ip -6 route del "$route"
-    route="`route -6 | awk '/^2002/ {print $1}' | head -1`"
+    route="`ip -6 route | awk '/^2002/ {print $1}' | head -1`"
 done
 ip tunnel del tun6to4
