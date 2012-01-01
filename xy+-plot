@@ -4,12 +4,31 @@
 #
 # OUT: gnuplot script for plotting that data  on stdout
 
+# TODO: optparse stuff:
+# - generalize --boxwidth VAL into 0..* --option NAME VAL
+# - move into separate module, reuse in all *plot* scripts
+
+require 'optparse'
+
+style="lines"
+boxwidth="0.7 absolute"
+
+opts = OptionParser.new
+opts.on("-s", "--style VAL") {|val| style=val }
+opts.on("-b", "--boxwidth VAL") {|val| boxwidth=val }
+opts.on("-h", "--help") {
+  puts "usage: #{File.basename(__FILE__)} [-s|--style (lines|boxes|...)] [-b|--boxwidth value] [xtitle ytitle0 ytitle1 ... ytitlen]"
+  exit
+}
+
+titles=opts.parse(*ARGV)
+
 samples = STDIN.readlines.map{|l|l.split}
 n_graphs = samples[0].length - 1
-case ARGV.length
+case titles.length
 when samples[0].length
-  xtitle = ARGV[0]
-  ytitles = ARGV[1..-1]
+  xtitle = titles[0]
+  ytitles = titles[1..-1]
 when 0
   ytitles = (0...n_graphs).map{|i| "variable #{i}"}
 else
@@ -17,7 +36,8 @@ else
 end
 
 puts %Q{set xlabel "#{xtitle}"} if xtitle
-puts "plot #{ytitles.map{|title| "'-' with lines title '#{title}'"}.join(',')}"
+puts "set boxwidth #{boxwidth}"
+puts "plot #{ytitles.map{|title| "'-' with #{style} title '#{title}'"}.join(',')}"
 
 (1..n_graphs).each do |y_idx|
   samples.each do |sample|
