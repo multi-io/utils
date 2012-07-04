@@ -12,7 +12,7 @@ while (<STDIN>) {
     push @rows, [$x,@ys];
     map { $avgs[$_] += $ys[$_]/$num } (0..$#ys);
     if ($#rows == $num - 1) {
-        print "$x " . join(' ', @avgs) . "\n";
+        print "$rows[$#rows/2]->[0] " . join(' ', @avgs) . "\n";
         ($rm_x,@rm_ys) = @{shift @rows};
         map { $avgs[$_] -= $rm_ys[$_]/$num } (0..$#rm_ys);
     }
