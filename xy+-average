@@ -5,19 +5,17 @@
 # OUT: - lines with x avg_0 avg_1 ... avg_n on stdout, where each avg_x is a
 #        "moving average" of n consecutive y_x's from the input data
 
-$num = $ARGV[0] or die "usage: $0 <number of consecutive (x,y) pairs to average>";
+$num = $ARGV[0] or die "usage: $0 <number of consecutive (x,y...) tuples to average>";
 
-$cnt=0;
 while (<STDIN>) {
     ($x,@ys)=split;
-    if ($cnt==0) {
-        $startx = $x;
-        @avgs = map { 0 } @ys;
-    }
-    map { $avgs[$_] += $ys[$_]/$num }  (0..$#ys);
-    ++$cnt;
-    if ($cnt==$num) {
-        print "$startx " . join(' ', @avgs) . "\n";
-        $cnt=0;
+    push @rows, [$x,@ys];
+    map { $avgs[$_] += $ys[$_]/$num } (0..$#ys);
+    if ($#rows == $num - 1) {
+        print "$x " . join(' ', @avgs) . "\n";
+        ($rm_x,@rm_ys) = @{shift @rows};
+        map { $avgs[$_] -= $rm_ys[$_]/$num } (0..$#rm_ys);
     }
 }
+
+#TODO: numerical instability due to @avgs being initialized only once?
