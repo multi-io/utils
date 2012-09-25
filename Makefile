@@ -183,6 +183,7 @@ GLOBALUSER=root
 
 SBINFILES=\
 memusagelogd \
+publish_aliceip_to_dns_continuously \
 thermallogd \
 transferratelogd \
 run-ppp-over-ssh \
