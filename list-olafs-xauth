@@ -1,0 +1,12 @@
+#!/bin/sh
+# list olaf's local xauth, independent of environment variable settings (so we can be called from outside the
+#   X session's process tree, e.g. from a remote login shell)
+
+#XAUTHORITY=/home/olaf/.xauthority-current
+
+#findps=xfce4-session
+findps=xinitrc
+XAUTHORITY=$(cat /proc/$(ps -afuolaf | grep "$findps" | grep -v grep | awk '{print $2}')/environ | grepre '\0XAUTHORITY=(.*?)\0')
+
+export XAUTHORITY
+xauth list $*

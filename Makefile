@@ -214,6 +214,7 @@ USERFILES=\
 firefox-memusage-log-create.sh \
 firefox-memusage-log-plot.sh \
 irexec.pl \
+list-olafs-xauth \
 ssh-forward-allisst \
 ssh-forward-allisst-continuously \
 ssh-forward-isstcvs \
