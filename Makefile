@@ -180,6 +180,7 @@ zipjavasources
 GLOBALTARGET=/usr/local/bin
 
 GLOBALUSER=root
+SUCOMMAND=su
 
 SBINFILES=\
 memusagelogd \
@@ -242,12 +243,13 @@ include Makefile.conf
 install-global: $(GLOBALFILES)
 	mkdir -p $(GLOBALTARGET)
 	mkdir -p $(SBINTARGET)
-	rm -f $(TMP); umask 022; echo >$(TMP)
+	rm -f $(TMP); umask 022; echo '#!/bin/sh' >$(TMP)
 	$(foreach file,$(GLOBALFILES), echo mkdir -p '$(GLOBALTARGET)'/`dirname $(file)` >>$(TMP); \
 				       echo install $(file) '$(GLOBALTARGET)'/`dirname $(file)` >>$(TMP);)
 	$(foreach file,$(SBINFILES), echo mkdir -p '$(SBINTARGET)'/`dirname $(file)` >>$(TMP); \
 				       echo install $(file) '$(SBINTARGET)'/`dirname $(file)` >>$(TMP);)
-	su $(GLOBALUSER) $(TMP)
+	chmod +x $(TMP)
+	$(SUCOMMAND) $(GLOBALUSER) $(TMP)
 	rm -f $(TMP)
 
 
