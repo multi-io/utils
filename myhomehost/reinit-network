@@ -1,0 +1,16 @@
+#!/bin/sh
+
+/etc/init.d/dnsmasq stop
+sleep 1
+/etc/init.d/hostapd stop
+sleep 1
+/etc/init.d/networking stop
+
+sleep 8
+
+/etc/init.d/networking start
+sleep 1
+/etc/init.d/hostapd start
+sleep 1
+/etc/init.d/dnsmasq start
+

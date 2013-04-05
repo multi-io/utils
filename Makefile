@@ -197,6 +197,7 @@ myhomehost/backup-tick-to \
 myhomehost/backup-tick-to-bup1 \
 myhomehost/kill-vpn-continuously \
 myhomehost/isstsshvpn-routes \
+myhomehost/reinit-network \
 myhomehost/sofdsshvpn-routes \
 myhomehost/setup-6to4 \
 myhomehost/shutdown-6to4 \
