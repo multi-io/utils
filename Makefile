@@ -22,6 +22,7 @@ create-index-htmls \
 cutv \
 deb-import-signing-key \
 emacs_or_fallback.sh \
+get_wan_ip \
 gtetrinet-configure-keyboard \
 gtetrinet-unconfigure-keyboard \
 gnuplot-and-wait \
