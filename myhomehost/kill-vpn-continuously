@@ -4,13 +4,9 @@ log_msg() {
     date "+%c: $*" >&2
 }
 
-get_ip() {
-  ifconfig ppp0 | grepre 'inet addr:(.*?)\s'
-}
-
-oldip="`get_ip`"
+oldip="`get_wan_ip`"
 while true; do
-  ip="`get_ip`"
+  ip="`get_wan_ip`"
   if ! [ "$ip" = "$oldip" ]; then
     log_msg "DSL IP change detected: $oldip -> $ip. Killing VPN";
     kill-vpn.sh
