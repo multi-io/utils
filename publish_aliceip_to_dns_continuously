@@ -9,7 +9,7 @@ while true; do
     if [ "$newip" != "$ip" ]; then
 	if [ -n "$newip" ]; then
 	    logger -i "$0: WAN IP changed to $newip; publishing it.";
-	    timeout -k 60 50 /usr/sbin/ddclient -syslog -ip "$newip" && ip="$newip";
+	    timeout -k 60 50 /usr/sbin/ddclient -syslog -ip "$newip" && ip="$newip" && logger -i "$0: new WAN IP $newip published." || logger -i "$0: FAILED to publish WAN ip $newip."
 	else
 	    logger -i "$0: no WAN IP found. Won't unpublish it (it is too late, right?)";
 	fi
