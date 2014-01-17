@@ -15,7 +15,7 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 # Copyright 2001 by Lennart Poettering <mz67616c6d61726b@poettering.de>
-# adapted to Netscape Bookmarks by Olaf Klischat <klischat@cs.tu-berlin.de>
+# adapted to Netscape Bookmarks by Olaf Klischat <olaf.klischat@gmail.com>
 # This script will create a HTML page of your Galeon XML Bookmarks
 
 # Further information, usage examples and current versions may be found on

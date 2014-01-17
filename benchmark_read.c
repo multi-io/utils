@@ -1,14 +1,10 @@
 /**
  * Benchmark program for linear reading from files or block devices
  * (hard drives, CDs, DVDs, USB storage etc.). Sample output for a HD:
- * http://user.cs.tu-berlin.de/~klischat/hdabench.png
+ * hdabench.png
  *
  * (c) Olaf Klischat 2007
  *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License as
- *  published by the Free Software Foundation; either version 2 of the
- *  License, or (at your option) any later version.
  */
 
 //probably Linux-specific parts: BLKGETSIZE ioctl,

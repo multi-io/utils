@@ -32,7 +32,6 @@ gnuplot-png \
 jolietrename \
 jolietrenamecurrdir \
 jolietnamecheckcurrdir \
-chk4rlogins \
 chr \
 chrcodes \
 cpmydir.sh \
@@ -52,7 +51,6 @@ eardiff.sh \
 edit-encrypted \
 eol2nul \
 execlogged \
-ExecuteQuery \
 fetchheise-fetcharticles \
 fetchheise-idxpage-fetchallarticles \
 fetchheise-idxpage-idxpageurls \
@@ -61,9 +59,7 @@ fetchheise-idxpages-articleurls \
 fetchmail-setup-tunnel.sh \
 firefox-print-stacktraces \
 firefox-print-stacktraces.gdbscript \
-mail.cs.tu-berlin.de.cert \
 fetchmail-shutdown-tunnel.sh \
-ff \
 file2disk.sh \
 fsumup \
 fullpath \
@@ -119,7 +115,6 @@ run-if-not-running.sh \
 scp-myissthost \
 sensible-browser \
 settimefromntp \
-showhomeip \
 show-encrypted \
 sleepingsongs \
 slowdown.pl \
@@ -189,14 +184,11 @@ publish_aliceip_to_dns_continuously \
 thermallogd \
 transferratelogd \
 run-ppp-over-ssh \
-myissthost/run-isstsshvpn \
-myissthost/run-isstsshvpn-continuously \
 mysofdhost/run-sofdsshvpn \
 mysofdhost/run-sofdsshvpn-continuously \
 myhomehost/backup-tick-to \
 myhomehost/backup-tick-to-bup1 \
 myhomehost/kill-vpn-continuously \
-myhomehost/isstsshvpn-routes \
 myhomehost/reinit-network \
 myhomehost/sofdsshvpn-routes \
 myhomehost/setup-6to4 \
@@ -205,8 +197,6 @@ myhomehost/wlan-scan \
 myhomehost/wlan-switch-to-ap \
 myhomehost/wlan-switch-to-sta \
 myhomehost/wlan-restartap \
-myissthost/setup-6to4 \
-myissthost/shutdown-6to4 \
 myhomedesktop/setup-6to4 \
 myhomedesktop/shutdown-6to4 \
 mylaptop/wlan-reinit

@@ -2,7 +2,7 @@
 # This program is copyright 2002 by Joey Hess <joeyh@debian.org>,
 # and is licensed under the terms of the GNU GPL, version 2 or higher.
 #
-# Olaf Klischat <klischat@cs.tu-berlin.de>  special casing for Opera
+# Olaf Klischat <olaf.klischat@gmail.com>  special casing for Opera
 my $url=shift;
 if (exists $ENV{BROWSER}) {
 	foreach (split ':' , $ENV{BROWSER}) {

@@ -1,4 +1,14 @@
 #!/bin/sh
+# output names of existing files whose names match properties of the this machine/site
+# may be used e.g. for running site-specific shell code from .bash_profile:
+#
+#  for f in `generate-site-specific-filenames .bash_profile.`; do
+#    . "$f"
+#  done
+#
+# ...would run .bash_profile.Linux / .bash_profile.cygwin / .bash_profile.myhomedesktop-Linux etc.,
+#   depending on which of those files exist and which machine you're on. So you can have the same
+#   set of files everywhere.
 
 myecho() {
   printf $1'\n'

@@ -1,5 +1,8 @@
 #!/bin/sh
+# identify mutiple properties of the machine or site the script is run on
+# used by generate-site-specific-filenames
 # should probably be named "whereami", but a program with that name already exists
+# MODIFY to cover your machines/sites
 
 if [ $# -gt 0 ]; then
   for attr in "$@"; do

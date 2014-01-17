@@ -1,3 +1,0 @@
-#!/bin/sh
-
-lynx -dump http://user.cs.tu-berlin.de/~klischat/ipaddress.txt

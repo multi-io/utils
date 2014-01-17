@@ -1,8 +1,0 @@
-#!/bin/sh
-
-# Java heap size, in megabytes
-JAVA_HEAP_SIZE=256
-
-eq_home=/usr/local/ExecuteQuery
-
-exec java -mx${JAVA_HEAP_SIZE}m -jar "${eq_home}/eq.jar"

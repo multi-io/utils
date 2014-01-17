@@ -1,4 +1,0 @@
-#!/bin/sh
-# post: no global IPv6 addresses on tun6to4
-
-ip tunnel del tun6to4
