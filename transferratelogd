@@ -1,10 +1,13 @@
 #!/bin/sh
 
-trap 'kill 0' EXIT
+set -e
 
-exec >>/var/log/transferrate.log 2>&1
+trap 'kill 0' EXIT
+trap 'true' HUP
 
 export PATH="/usr/local/bin:$PATH"
-
-log-transferrate ppp0 20 | prepend-time
-
+while true; do
+    log-transferrate ppp0 20 | prepend-time >>/var/log/transferrate.log 2>&1 &
+    wait "$!" || true    # HUP sent by logrotete => kill the pipe, restart loop, reopen log file and start over
+    kill "$!"
+done
