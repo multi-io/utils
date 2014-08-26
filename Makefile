@@ -78,6 +78,7 @@ instfilelist.pl \
 ip6to4 \
 irexec.pl \
 iriver2m3ufile.pl \
+jsonpp \
 kill-flashplugin \
 kill-vpn.sh \
 locateme \

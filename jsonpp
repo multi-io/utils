@@ -1,0 +1,9 @@
+#!/bin/sh
+# JSON pretty-printer. Also maintains ordering of hash keys stable between invocations (contrary to perl's json_pp),
+#   thus making the output suitable for diffing.
+# Uses Groovy/JsonOutput.
+#
+# in: JSON on stdin
+# out: pretty-printed (indented) JSON on stdout
+
+groovy -e 'println groovy.json.JsonOutput.prettyPrint(System.in.text)'
