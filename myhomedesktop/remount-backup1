@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+umount /mnt/backup1 || true
+cryptsetup close /dev/mapper/backup1_crypt || true
+cryptsetup open --type luks /dev/disk/by-id/scsi-SSeagate_Expansion_Desk_NA4KKCTV-part1 backup1_crypt
+mount /mnt/backup1

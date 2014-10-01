@@ -198,6 +198,7 @@ myhomehost/wlan-scan \
 myhomehost/wlan-switch-to-ap \
 myhomehost/wlan-switch-to-sta \
 myhomehost/wlan-restartap \
+myhomedesktop/remount-backup1 \
 myhomedesktop/setup-6to4 \
 myhomedesktop/shutdown-6to4 \
 mylaptop/wlan-reinit
