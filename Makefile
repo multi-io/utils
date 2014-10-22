@@ -43,6 +43,7 @@ cvslog2kwsubst \
 cvsshowunkn.pl \
 deb-fetch-uris \
 deb-list-pkgs \
+deb-sourceslist-change-debhost \
 deb-xtract-uris \
 disk2file.sh \
 dos2unixm.sh \

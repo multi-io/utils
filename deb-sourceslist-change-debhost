@@ -1,0 +1,33 @@
+#!/usr/bin/ruby -w
+
+def run_filter(filename)
+  if filename == '-'
+    yield(STDIN, STDOUT)
+  else
+    # in-place editing of filename
+    File.open(filename) do |input|
+      File.unlink(filename)
+      File.open(filename, 'w') do |output|
+        yield(input, output)
+      end
+    end
+  end
+end
+
+prefix,filename = ARGV
+unless prefix
+  STDERR.puts "#{File.basename(__FILE__)}: quickly change all debian.org package source URLs in an apt.sources file to something else. Particularly useful for switching between snapshot.debian.org releases."
+  STDERR.puts "usage: #{File.basename(__FILE__)} <url prefix, e.g. http://snapshot.debian.org/archive/debian/xxxx/> [filename (default: sources.list)|-]"
+  exit
+end
+
+filename ||= 'sources.list'
+
+run_filter(filename) do |input,output|
+  while line=input.gets
+    if m = line.match(/^deb.*?\s+(.*?debian\.org.*?\/debian\/.*?)[\s$]/)
+      line[m.begin(1)...m.end(1)] = prefix
+    end
+    output.puts line
+  end
+end
