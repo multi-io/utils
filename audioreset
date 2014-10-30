@@ -12,7 +12,7 @@ aumix -L
 #  Ganzzahl 0..100). "amixer cget <control>" zeigt den Wertebereich
 #  sowie den aktuellen Wert des Controls <control> an
 
-amixer cset iface=MIXER,name='Front Playback Volume' 65%
+amixer cset iface=MIXER,name='Front Playback Volume' 100%
 amixer cset iface=MIXER,name='Front Playback Switch' on
 
 amixer cset iface=MIXER,name='PCM Playback Volume' 70%

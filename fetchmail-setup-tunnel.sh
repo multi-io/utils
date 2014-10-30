@@ -8,8 +8,7 @@ set -e
 # echo $! >/tmp/fetchmail-tunnel.$UID.pid
 # echo "$0: sleeping 15 secs, waiting for SSH to set up the tunnel"
 # echo "$0: TODO: this is a race condition"
-# # TODO: tja... wie teilt der laufende ssh-Prozess nach auﬂen mit, dass
-# #       die Verbindung hergestellt wurde? Shellscripting saugt!
+# # TODO: how does the ssh process tell the outside world that the connection has been established?
 # sleep 15;
 
 # mit SSL
