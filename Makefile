@@ -62,6 +62,7 @@ firefox-print-stacktraces \
 firefox-print-stacktraces.gdbscript \
 fetchmail-shutdown-tunnel.sh \
 file2disk.sh \
+Linux/file-cached-blocks \
 fsumup \
 fullpath \
 gal2nsbm.py \
