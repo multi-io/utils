@@ -62,7 +62,6 @@ firefox-print-stacktraces \
 firefox-print-stacktraces.gdbscript \
 fetchmail-shutdown-tunnel.sh \
 file2disk.sh \
-Linux/file-cached-blocks \
 fsumup \
 fullpath \
 gal2nsbm.py \
@@ -101,7 +100,6 @@ memusage_for_pid_by_lib \
 memusage-log-for-pid \
 memusage-snapshot \
 mlnet-disksize-watchdog \
-mouseclick \
 mplayerctl \
 mplayer-ctlable \
 mplayer-dump-latest \

@@ -20,4 +20,8 @@ $EDITOR $tmpfile &&
 echo "encrypting..." &&
 gpg --yes -o "$encrfile" --symmetric -a "$tmpfile"
 
-shred -u $tmpfile
+shred -u $tmpfile || {
+    echo "WARNING: shred -u $tmpfile didn't work, using rm. This might leave the decrypted data intact on the block device" >&2
+    rm -f $tmpfile
+}
+
