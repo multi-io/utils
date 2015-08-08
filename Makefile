@@ -176,8 +176,7 @@ zipjavasources
 #GLOBALTARGET=$(HOME)/bin
 GLOBALTARGET=/usr/local/bin
 
-GLOBALUSER=root
-SUCOMMAND=su
+SUCOMMAND=su root
 
 SBINFILES=\
 memusagelogd \
@@ -243,7 +242,7 @@ install-global: $(GLOBALFILES)
 	$(foreach file,$(SBINFILES), echo mkdir -p '$(SBINTARGET)'/`dirname $(file)` >>$(TMP); \
 				       echo install $(file) '$(SBINTARGET)'/`dirname $(file)` >>$(TMP);)
 	chmod +x $(TMP)
-	$(SUCOMMAND) $(GLOBALUSER) $(TMP)
+	$(SUCOMMAND) $(TMP)
 	rm -f $(TMP)
 
 
