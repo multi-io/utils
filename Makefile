@@ -117,7 +117,6 @@ scp-myissthost \
 sensible-browser \
 settimefromntp \
 show-encrypted \
-sleepingsongs \
 slowdown.pl \
 sumsizes \
 sumup \
