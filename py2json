@@ -1,0 +1,9 @@
+#!/usr/bin/python
+
+import sys
+import json
+
+l = sys.stdin.readline()
+while l:
+    print json.dumps(eval(l))
+    l = sys.stdin.readline()
