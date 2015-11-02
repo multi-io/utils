@@ -40,6 +40,12 @@ case "$hostname" in
     swangoose)
         place=myissthost
         ;;
+    oklischat)
+	place=sys11laptop
+	;;
+    jumphost.*.syseleven.de)
+        place=sys11jump
+        ;;
 esac
 
 
