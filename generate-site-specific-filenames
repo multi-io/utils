@@ -21,11 +21,12 @@ if test "$1" = -n; then
   shift
 fi
 
-base="$1"
+#TODO efficiency... (lots of repeated invocations)
 
-for ext in "`locateme place`" \
-           "`locateme osname`" \
-           "`locateme place`-`locateme osname`"; do
-    fn="$base$ext"
-    ( test -f "$fn" || test -d "$fn" || test -h "$fn" ) && myecho $fn
+base="$1"
+keys=$(locateme | sed 's/:.*//g')
+
+for k in $keys; do
+    ls -d ${base}* 2>/dev/null | grep "$(locateme $k)" 
 done
+
