@@ -255,4 +255,4 @@ install-user: $(USERFILES)
 
 
 mouseclick: mouseclick.c
-	$(CC) $(CFLAGS) $(X11LDFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $(X11LDFLAGS) -o $@ $< || (echo "WARNING: compiling $@ failed, creating it as an empty file"; touch $@)
