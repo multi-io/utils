@@ -7,9 +7,14 @@ sub unquote($) {
     $_[0] =~ s/\n//g;
     $_[0] =~ s/<br>/\n/g;
     $_[0] =~ s!<br/>!\n!g;
+    $_[0] =~ s!</?p>!\n!g;
     $_[0] =~ s!<br />!\n!g;
+    $_[0] =~ s!<blockquote>![blockquote]\n!g;
+    $_[0] =~ s!</blockquote>![/blockquote]\n!g;
     $_[0] =~ s/&nbsp;?/ /g;
     $_[0] =~ s/<.*?>//g;
+    $_[0] =~ s/\[blockquote\]/\<blockquote\>/g;
+    $_[0] =~ s/\[\/blockquote\]/\<\/blockquote\>/g;
     $_[0] =~ s/&gt;?/>/g;
     $_[0] =~ s/&lt;?/</g;
     $_[0] =~ s/&auml;?/ä/g;
@@ -31,10 +36,11 @@ exit(1) unless GetOptions ("outfilebase=s"  => \$outfilebase,
 
 while (<STDIN>) {
     chomp; $url=$_;
-    ($msgid) =  ($url =~ /msg-(\d+)/);
+    ($msgid) =  ($url =~ /posting-(\d+)/);
     open(WGET, "wget-withbrowsersettings -q -O- '$url' |") or die "couldn't run wget-withbrowsersettings: $!";
+    #open(WGET, "<$url");
     local $/ = undef;
-    my ($time,$subject,$author,$body) = <WGET> =~ m!class="posting_date">(.*?)</div>.*?class="posting_subject">(.*?)<.*?<i>(.*?)</i>.*?<p class="posting_text">(.*?)</p>!si;
+    my ($author,$time,$subject,$body) = <WGET> =~ m!span class="full_user_string">.*?<span.*?>(.*?)</.*?class="posting_timestamp" +title="(.*?)".*?class="thread_title">.*?<a .*?>\s*(.*?)\s*<.*?div class="post">(.*?)<div class="rate_buttons"!si;
     unquote($subject); unquote($author); unquote($body);
     if (defined($outfilebase)) {
         open(OUT, ">$outfilebase$msgid");
