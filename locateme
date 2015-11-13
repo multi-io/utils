@@ -53,9 +53,19 @@ osname="`uname`"
 osversion="`uname -r`"
 arch="`uname -m`"
 
+if [ -n "$(type -p lsb_release)" ]; then
+    distr_id=$(lsb_release -si)
+    distr_release=$(lsb_release -sr)
+else
+    distr_id='unknown'
+    distr_release='unknown'
+fi
+
 cat <<EOF
 place:$place
 osname:$osname
 osversion:$osversion
 arch:$arch
+distr_id:$distr_id
+distr_release:$distr_release
 EOF

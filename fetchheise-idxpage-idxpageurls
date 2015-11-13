@@ -1,40 +1,30 @@
-#!/usr/bin/perl
+#!/usr/bin/env ruby
 # in: URL of index page on cmdline
 # out: URLs of all index pages in that forum/"Beitragsübersicht" on stdout,
 #      one URL per line
 
-use URI;
+require 'nokogiri'
 
-$url=$ARGV[0] or die "usage: $0 <url>";
+url = ARGV[0] or raise "usage: #{$0} <url>"
 
-#print $url,"\n";
+page = Nokogiri::HTML(IO.popen("wget-withbrowsersettings -q -O- '#{url}'"))
+spans = page.css('span').select{|span| span['class'] and span['class'].include?('seiten')}
+links = (spans and spans[0].css('a').map{|a| a['href'] })
 
-open(WGET, "wget-withbrowsersettings -q -O- '$url' |") or die "couldn't run wget-withbrowsersettings: $!";
+if links
+    # last link is biggest N of all links ending in /page-<N>/.
+    re = /^(.*?\/)page-(.*?)\/$/
+    base = links[0].match(re)[1]
+    max = links.select{|l| l.match(re) }.map{|l| Integer(l.match(re)[2]) }.max
+    all_links = (1..max).map{|i| "#{base}page-#{i}/" }
+    if url.match(re)
+        all_links = (all_links + [url]).uniq
+    end
+    all_links.each do |l|
+        puts l
+    end
+else
+    # no index page links found => url itself is the only index page
+    puts url
+end
 
-($hsmin,$hsmax)=(999999999,0);
-
-while(<WGET>) {
-    chomp;
-    foreach (m!a href="/(.*?)"!gi) {
-        ($prenew,$hs,$postnew) = m!^(.*?)hs-(.*?)([/$\&].*)!;
-        next unless defined($hs);
-        if (defined($pre) and (not($pre eq $prenew) or not($post eq $postnew))) {
-            print STDERR "$0: warning: found 'out-of-sequence' url: $_\n";
-            print URI->new_abs($_,$url)->as_string, "\n";
-        }
-        else {
-            ($pre,$post) = ($prenew,$postnew);
-            $hsmin=$hs if ($hs<$hsmin);
-            $hsmax=$hs if ($hs>$hsmax);
-        }
-    };
-}
-
-close(WGET);
-
-$hsmin=0 if ($hsmin==16);
-
-for ($hs=$hsmin; $hs<=$hsmax; $hs+=16) {
-    # print URI->new_abs("${pre}hs-${hs}${post}",$url)->as_string, "\n";
-    print "http://www.heise.de/${pre}hs-${hs}${post}\n";
-}
