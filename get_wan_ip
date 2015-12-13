@@ -16,5 +16,11 @@ if [ -n "$ip" ] && ! [[ "$ip" == 192.168.* ]] && ! [[ "$ip" == '0.0.0.0' ]]; the
   exit 0
 fi
 
+ip=$(timeout 4 curl http://icanhazip.com 2>/dev/null)
+if [ -n "$ip" ]; then
+  echo "$ip"
+  exit 0
+fi
+
 exit 1
 
