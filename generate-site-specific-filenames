@@ -27,6 +27,6 @@ base="$1"
 keys=$(locateme | sed 's/:.*//g')
 
 for k in $keys; do
-    ls -d ${base}* 2>/dev/null | grep "$(locateme $k)" 
+    ls -d ${base}* 2>/dev/null | grep -F "$(locateme $k)" 
 done
 
