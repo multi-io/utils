@@ -1,11 +1,22 @@
 #!/usr/bin/perl -w
 
-$sum=0;
+use Getopt::Long;
+
+$avg = 0;
+
+exit(1) unless GetOptions ("avg|a" => \$avg);
+
+$sum = $n =0;
 
 while (<>) {
     for my $num (split /\s+/) {
         $sum += $num;
+        $n++;
     }
+}
+
+if ($avg) {
+    $sum /= $n;
 }
 
 print $sum, "\n";
