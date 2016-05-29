@@ -1,65 +1,61 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env ruby
 # in: URLs of article pages on stdin, one per line
 # out: those articles, including subject, time, author, msgid, and body,
 #      as plain text, encoded in ISO latin1
 
-sub unquote($) {
-    $_[0] =~ s/\n//g;
-    $_[0] =~ s/<br>/\n/g;
-    $_[0] =~ s!<br/>!\n!g;
-    $_[0] =~ s!</?p>!\n!g;
-    $_[0] =~ s!<br />!\n!g;
-    $_[0] =~ s!<blockquote>![blockquote]\n!g;
-    $_[0] =~ s!</blockquote>![/blockquote]\n!g;
-    $_[0] =~ s/&nbsp;?/ /g;
-    $_[0] =~ s/<.*?>//g;
-    $_[0] =~ s/\[blockquote\]/\<blockquote\>/g;
-    $_[0] =~ s/\[\/blockquote\]/\<\/blockquote\>/g;
-    $_[0] =~ s/&gt;?/>/g;
-    $_[0] =~ s/&lt;?/</g;
-    $_[0] =~ s/&auml;?/ä/g;
-    $_[0] =~ s/&uuml;?/ü/g;
-    $_[0] =~ s/&ouml;?/ö/g;
-    $_[0] =~ s/&Auml;?/Ä/g;
-    $_[0] =~ s/&Uuml;?/Ü/g;
-    $_[0] =~ s/&Ouml;?/Ö/g;
-    $_[0] =~ s/&szlig;?/ß/g;
-    $_[0] =~ s/&quot;?/\"/g;
-    $_[0] =~ s/&amp;?/&/g;
-}
+require 'nokogiri'
 
-use Getopt::Long;
+class String
+  def to_text(indent, wordwrap)
+    self.split("\n", -1).map{|line| indent+line }.join("\n")
+  end
+end
 
-$outfilebase = undef;
-exit(1) unless GetOptions ("outfilebase=s"  => \$outfilebase,
-                          );
+class Nokogiri::XML::Node
+  def first_node(elt_type, css_class)
+    self.css(elt_type).find{|a| a['class'] && a['class'].split.include?(css_class)}
+  end
 
-while (<STDIN>) {
-    chomp; $url=$_;
-    ($msgid) =  ($url =~ /posting-(\d+)/);
-    open(WGET, "wget-withbrowsersettings -q -O- '$url' |") or die "couldn't run wget-withbrowsersettings: $!";
-    #open(WGET, "<$url");
-    local $/ = undef;
-    my ($author,$time,$subject,$body) = <WGET> =~ m!span class="full_user_string">.*?<span.*?>(.*?)</.*?class="posting_timestamp" +title="(.*?)".*?class="thread_title">.*?<a .*?>\s*(.*?)\s*<.*?div class="post">(.*?)<div class="rate_buttons"!si;
-    unquote($subject); unquote($author); unquote($body);
-    if (defined($outfilebase)) {
-        open(OUT, ">$outfilebase$msgid");
-    } else {
-        *OUT = *STDOUT;
-    }
-    print OUT <<EOS;
-subject: $subject
-time: $time
-author: $author
-msgid: $msgid
-url: $url
+  def to_bbtext(indent='', wordwrap=true)
+    if Nokogiri::XML::Text === self
+      return self.text.strip.to_text(indent, wordwrap)
+    end
 
-body:
-$body
-EOS
-    close(OUT) if (defined($outfilebase));
-    close(WGET);
-}
+    case self.name
+    when 'br'
+      ""
+    when 'p'
+      self.children.map{|c| c.to_bbtext(indent, wordwrap)}.join("#{indent}\n#{indent}\n")
+    when 'blockquote'
+      self.children.map{|c| c.to_bbtext("#{indent}> ", wordwrap)}.join("#{indent}> \n")
+    when 'code'
+      self.children.map{|c| c.to_bbtext("#{indent}| ", false)}.join("#{indent}| \n")
+    when 'img'
+      "#{indent}#{self.attr('alt') || ''}\n"  # TODO display inline (no line break) properly
+    else
+      self.children.map{|c| c.to_bbtext(indent, wordwrap)}.join("#{indent}\n#{indent}\n")
+    end
+  end
+
+end 
 
 
-# TODO: extract msgid of parent article (if any)
+STDIN.each_line do |url|
+  #page = Nokogiri::HTML(IO.popen("wget-withbrowsersettings -q -O- #{url}"))
+  page = Nokogiri::HTML(File.open("fetchheise-fetcharticles.html"))
+
+  time_node = page.first_node('time', 'posting_timestamp')
+  auth_node = page.first_node('span', 'full_user_string')
+  subj_node = page.first_node('h1', 'thread_title')
+  post_node = page.first_node('div', 'post').first_node('div', 'bbcode_v1')
+
+  puts "subject: #{subj_node.text.strip}"
+  puts "time: #{time_node.attr('title')}"
+  puts "author: #{auth_node.text.strip}"
+  puts "msgid: TODO"
+  puts "url: #{url}"
+  puts "\nbody:\n#{post_node.to_bbtext('i')}"
+end
+
+
+# http://www.heise.de/forum/heise-Developer/News-Kommentare/Vor-10-Jahren-Linus-Torvalds-baut-Git/Re-Schon-nach-wenigen-Tagen/posting-2265346/show/http://www.heise.de/forum/heise-Developer/News-Kommentare/Vor-10-Jahren-Linus-Torvalds-baut-Git/Re-Schon-nach-wenigen-Tagen/posting-2265346/show/
