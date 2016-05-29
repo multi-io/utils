@@ -150,6 +150,7 @@ export-sawfish \
 perl-e-perline \
 perl-e-perline-inplace \
 psfindbywd \
+py2json \
 rspeedway \
 ruby-e-perline \
 show-spurious-listeners \
