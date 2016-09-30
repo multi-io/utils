@@ -81,6 +81,7 @@ ip6to4 \
 irexec.pl \
 iriver2m3ufile.pl \
 jsonpp \
+json_pp_perline \
 kill-flashplugin \
 kill-vpn.sh \
 locateme \
