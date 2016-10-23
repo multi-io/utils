@@ -255,5 +255,5 @@ install-user: $(USERFILES)
 				     install $(file) '$(USERTARGET)'/`dirname $(file)`;)
 
 
-mouseclick: mouseclick.c
-	$(CC) $(CFLAGS) $(X11LDFLAGS) -o $@ $< || (echo "WARNING: compiling $@ failed, creating it as an empty file"; touch $@)
+%: %.c
+	$(CC) $(CFLAGS) $(X11LDFLAGS) -o $@ $< || (echo "WARNING: compiling $@ failed, creating it as a fake stub"; (echo "#!/bin/sh"; echo "echo '$@ could not be compiled at utils make time (no cc)'") >$@)
