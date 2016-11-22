@@ -20,4 +20,4 @@ $EDITOR $tmpfile &&
 echo "encrypting..." &&
 gpg --yes -o "$encrfile" --symmetric -a "$tmpfile"
 
-shred -u $tmpfile
+shred -u $tmpfile || rm -f $tmpfile
