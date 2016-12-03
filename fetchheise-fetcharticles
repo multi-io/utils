@@ -7,7 +7,9 @@ require 'nokogiri'
 
 class String
   def to_text(indent, wordwrap)
-    self.split("\n", -1).map{|line| indent+line }.join("\n")
+    lines = self.split("\n", -1)
+    lines = [""] if lines==[]  # should never happen but does...
+    lines[0] + "\n" + lines[(1..-1)].map{|line| indent+line }.join("\n")
   end
 end
 
@@ -23,17 +25,17 @@ class Nokogiri::XML::Node
 
     case self.name
     when 'br'
-      ""
+      "\n#{indent}"
     when 'p'
-      self.children.map{|c| c.to_bbtext(indent, wordwrap)}.join("#{indent}\n#{indent}\n")
+      "\n#{indent}" + self.children.map{|c| c.to_bbtext(indent, wordwrap)}.join("") + "\n#{indent}"
     when 'blockquote'
-      self.children.map{|c| c.to_bbtext("#{indent}> ", wordwrap)}.join("#{indent}> \n")
+      "\n#{indent}" + self.children.map{|c| c.to_bbtext("#{indent}> ", wordwrap)}.join("") + "\n#{indent}"
     when 'code'
-      self.children.map{|c| c.to_bbtext("#{indent}| ", false)}.join("#{indent}| \n")
+      "\n#{indent}" + self.children.map{|c| c.to_bbtext("#{indent}| ", wordwrap)}.join("") + "\n#{indent}"
     when 'img'
-      "#{indent}#{self.attr('alt') || ''}\n"  # TODO display inline (no line break) properly
+      self.attr('alt') || '<image>'
     else
-      self.children.map{|c| c.to_bbtext(indent, wordwrap)}.join("#{indent}\n#{indent}\n")
+      "\n#{indent}" + self.children.map{|c| c.to_bbtext(indent, wordwrap)}.join("") + "\n#{indent}"
     end
   end
 
@@ -57,5 +59,7 @@ STDIN.each_line do |url|
   puts "\nbody:\n#{post_node.to_bbtext('i')}"
 end
 
+# TODO: maybe just let lynx/links render the body instead?
 
-# http://www.heise.de/forum/heise-Developer/News-Kommentare/Vor-10-Jahren-Linus-Torvalds-baut-Git/Re-Schon-nach-wenigen-Tagen/posting-2265346/show/http://www.heise.de/forum/heise-Developer/News-Kommentare/Vor-10-Jahren-Linus-Torvalds-baut-Git/Re-Schon-nach-wenigen-Tagen/posting-2265346/show/
+
+# http://www.heise.de/forum/heise-Developer/News-Kommentare/Vor-10-Jahren-Linus-Torvalds-baut-Git/Re-Schon-nach-wenigen-Tagen/posting-2265346/show/
