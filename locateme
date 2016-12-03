@@ -22,7 +22,7 @@ case "$domainname" in
         place=isst
         ;;
     *)
-        place="[unknown]"
+        place="unknown"
         ;;
 esac
 
