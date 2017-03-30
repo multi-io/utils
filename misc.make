@@ -44,6 +44,11 @@
 %.eps: %.gnuplot
 	(echo 'set terminal postscript eps'; cat $<) | gnuplot >$@
 
+#########Markdown
+%.html: %.md
+	pandoc $< -o $@
+
+
 #########image conversion
 
 
