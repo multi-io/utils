@@ -156,6 +156,8 @@ rspeedway \
 ruby-e-perline \
 show-spurious-listeners \
 spurious-listeners-watchdog \
+scp-ignorehostkey \
+ssh-ignorehostkey \
 svnshowunkn \
 tvbrowser \
 wget-logging \
