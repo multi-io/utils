@@ -6,6 +6,6 @@ else
     if emacsclient --eval 'nil' >/dev/null 2>&1; then
         exec emacsclient "$@";
     else
-        exec jed "$@";
+        exec vim "$@";
     fi
 fi
