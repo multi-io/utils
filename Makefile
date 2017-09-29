@@ -89,6 +89,7 @@ libusers \
 linehist \
 listexecs \
 lnum.sh \
+log-pcap-transferrate \
 log-transferrate \
 make-my_configure_help \
 m3u2iriver.pl \

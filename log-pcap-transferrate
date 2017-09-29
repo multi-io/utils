@@ -1,0 +1,39 @@
+#! /usr/bin/env python2.7
+
+from __future__ import print_function
+import sys
+import time
+
+from scapy.all import sniff,IP,TCP
+
+if len(sys.argv) > 1:
+    filter = sys.argv[1]
+else:
+    filter = 'tcp and port 22'
+
+print("tracing filter: {0}".format(filter), file=sys.stderr)
+
+t0 = time.time()
+count = 0
+
+def handle_pkg(pkg):
+    global t0, count
+
+    #print(pkg.summary())
+    count += len(pkg)
+    t = time.time()
+    dt = t - t0
+    
+    if dt > 1:
+        print("{0} bytes/s".format(count/dt))
+        count = 0
+        t0 = t
+
+
+pkgs = sniff(filter=filter, store=0, prn=handle_pkg)
+
+
+# TODOs:
+# - output rates every second if no packets are received
+# - performance... capture multiple packets per callback? (would prolly require libpcap patches)
+# - port to C...
