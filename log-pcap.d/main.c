@@ -2,14 +2,44 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #include <pcap.h>
 
+// pcap_open_live timeout
+static const unsigned pcap_timeout = 500;
+
+// interval in usec between report outputs
+static const unsigned report_interval = 1000000;
+
+
+static unsigned long long bytes_count = 0;
 
 static void packet_cb(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
-    printf("caplen=%u len=%u\n", header->caplen, header->len);
+    bytes_count += header->len;
 }
 
+
+static struct timeval last_time = { tv_sec:0, tv_usec:0 }, curr_time = { tv_sec:0, tv_usec:0 };
+
+static unsigned long long last_bytes_count = -1;
+
+static void maybe_report() {
+    gettimeofday(&curr_time, NULL);
+    const unsigned long dt =
+        1000000 * curr_time.tv_sec + curr_time.tv_usec
+      - 1000000 * last_time.tv_sec - last_time.tv_usec;
+
+    if (curr_time.tv_sec > 0 && dt > report_interval) {
+        if (last_bytes_count >= 0) {
+            unsigned bps = 1000000 * (bytes_count - last_bytes_count) / dt;
+            printf("%u bytes/s, %llu bytes total\n", bps, bytes_count);
+        }
+
+        last_bytes_count = bytes_count;
+        last_time = curr_time;
+    }
+}
 
 int main() {
     char *dev, errbuf[PCAP_ERRBUF_SIZE];
@@ -18,7 +48,7 @@ int main() {
 
     pcap_t *handle;
 
-    const char *filter = "tcp and port 22";
+    const char *filter = "host 192.168.142.7 and tcp and port 22";
     struct bpf_program filter_program;
     
     dev = pcap_lookupdev(errbuf);
@@ -33,7 +63,7 @@ int main() {
         mask = 0;
     }
 
-    handle = pcap_open_live(dev, BUFSIZ, 0, 1000, errbuf);
+    handle = pcap_open_live(dev, 100, 0, pcap_timeout, errbuf);
     if (handle == NULL) {
         fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
         exit(2);
@@ -49,7 +79,16 @@ int main() {
     }
 
     fprintf(stderr, "Sniffing on device %s ...\n", dev);
-    pcap_loop(handle, -1, packet_cb, NULL);
+
+    maybe_report();
+    while (1) {
+        pcap_dispatch(handle, -1, packet_cb, NULL);
+        
+        // TODO we're losing any packets that arrive between pcap_dispatch calls.
+        // To avoid that, we'd probably have to use pcap_loop and either SIGALRM or a 2nd thread for reporting.
+        
+        maybe_report();
+    }
 
     return(0);
 }
