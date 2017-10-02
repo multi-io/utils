@@ -89,6 +89,7 @@ libusers \
 linehist \
 listexecs \
 lnum.sh \
+log-pcap \
 log-pcap-transferrate \
 log-transferrate \
 make-my_configure_help \
@@ -260,3 +261,12 @@ install-user: $(USERFILES)
 
 %: %.c
 	$(CC) $(CFLAGS) $(X11LDFLAGS) -o $@ $< || (echo "WARNING: compiling $@ failed, creating it as a fake stub"; (echo "#!/bin/sh"; echo "echo '$@ could not be compiled at utils make time (no cc)'") >$@)
+
+log-pcap:  log-pcap.d/log-pcap
+	cp $< $@
+
+log-pcap.d/log-pcap:
+	$(MAKE) -C log-pcap.d log-pcap || (echo "WARNING: compiling $@ failed, creating it as a fake stub"; (echo "#!/bin/sh"; echo "echo '$@ could not be compiled at utils make time'") >$@)
+
+
+
