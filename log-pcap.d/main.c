@@ -90,7 +90,8 @@ int main(int argc, const char *argv[]) {
     while (1) {
         pcap_dispatch(handle, -1, packet_cb, NULL);
         
-        // TODO we're losing any packets that arrive between pcap_dispatch calls.
+        // TODO we're losing any packets that arrive between pcap_dispatch calls (and maybe_report's running time
+        // also depends on stdoud's performance.
         // To avoid that, we'd probably have to use pcap_loop and either SIGALRM or a 2nd thread for reporting.
         
         maybe_report();
