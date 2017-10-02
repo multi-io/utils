@@ -3,4 +3,8 @@ LIBS=-lpcap
 default: log-pcap
 
 log-pcap: main.o
-	$(CC) -o $@ $(LIBS) $<
+	$(CC) $< $(LIBS) -o $@
+
+clean:
+	rm -f *.o log-pcap
+
