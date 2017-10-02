@@ -41,14 +41,20 @@ static void maybe_report() {
     }
 }
 
-int main() {
+int main(int argc, const char *argv[]) {
     char *dev, errbuf[PCAP_ERRBUF_SIZE];
     bpf_u_int32 mask;		/* The netmask of our sniffing device */
     bpf_u_int32 net;		/* The IP of our sniffing device */
 
     pcap_t *handle;
 
-    const char *filter = "host 192.168.142.7 and tcp and port 22";
+    if (argc < 2) {
+        fprintf(stderr, "usage: %s <pcap filter expression>\n", argv[0]);
+        exit(1);
+    }
+
+    //const char *filter = "host 192.168.142.7 and tcp and port 22";
+    const char *filter = argv[1];
     struct bpf_program filter_program;
     
     dev = pcap_lookupdev(errbuf);
