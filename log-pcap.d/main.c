@@ -20,9 +20,9 @@ static void packet_cb(u_char *args, const struct pcap_pkthdr *header, const u_ch
 }
 
 
-static struct timeval last_time = { tv_sec:0, tv_usec:0 }, curr_time = { tv_sec:0, tv_usec:0 };
+static struct timeval last_time = { .tv_sec=0, .tv_usec=0 }, curr_time = { .tv_sec=0, .tv_usec=0 };
 
-static unsigned long long last_bytes_count = -1;
+static unsigned long long last_bytes_count = 0;
 
 static void maybe_report() {
     gettimeofday(&curr_time, NULL);
@@ -31,10 +31,8 @@ static void maybe_report() {
       - 1000000 * last_time.tv_sec - last_time.tv_usec;
 
     if (curr_time.tv_sec > 0 && dt > report_interval) {
-        if (last_bytes_count >= 0) {
-            unsigned bps = 1000000 * (bytes_count - last_bytes_count) / dt;
-            printf("%u bytes/s, %llu bytes total\n", bps, bytes_count);
-        }
+        unsigned bps = 1000000 * (bytes_count - last_bytes_count) / dt;
+        printf("%u bytes/s, %llu bytes total\n", bps, bytes_count);
 
         last_bytes_count = bytes_count;
         last_time = curr_time;
