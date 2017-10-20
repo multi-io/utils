@@ -85,6 +85,7 @@ jsonpp \
 json_pp_perline \
 kill-flashplugin \
 kill-vpn.sh \
+kubectl-switch-ns \
 locateme \
 libusers \
 linehist \
