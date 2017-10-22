@@ -2,5 +2,10 @@
 
 set -e
 
-kubectl config set-context $(kubectl config current-context) --namespace="$1"
+ctx="$1"
+
+kubectl config set-context $(kubectl config current-context) --namespace="$ctx"
+
+# store in file so kubectl-get-ns doesn't have to run kubectl config get-contexts, which would take too long in a $PS1
+echo $ctx >~/.kube-current-ns
 

@@ -2,6 +2,8 @@
 
 set -e
 
-cc="$(kubectl config current-context)"
-kubectl config get-contexts "$cc" --no-headers | awk '{print $5}'
+#cc="$(kubectl config current-context)"
+#kubectl config get-contexts "$cc" --no-headers | awk '{print $5}'
+
+cat ~/.kube-current-ns
 
