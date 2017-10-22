@@ -86,6 +86,7 @@ json_pp_perline \
 kill-flashplugin \
 kill-vpn.sh \
 kubectl-switch-ns \
+kubectl-get-ns \
 locateme \
 libusers \
 linehist \
