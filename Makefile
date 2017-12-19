@@ -25,6 +25,7 @@ emacs_or_fallback.sh \
 get_wan_ip \
 gtetrinet-configure-keyboard \
 gtetrinet-unconfigure-keyboard \
+git-append-repo \
 gnuplot-and-wait \
 gnuplot-eps \
 gnuplot-eps-and-wait \
