@@ -31,9 +31,9 @@ git rev-list --reverse $remote/$repobranch | while read commit; do
     rm -rf "$subdir"
     mkdir -p "$subdir"
 
-    git ls-tree -r --full-name --full-tree $commit | while read line; do
+    git ls-tree -r -z --full-name --full-tree $commit | while read -d $'\0' line; do
 
-        read mode type id path <<<$line;  # TODO unescape \t, \n, and \\ in path (see git ls-tree --help)
+        read mode type id path <<<"$line";
 
         echo "got: line=$line params=$_params path=$path mode=$mode type=$type id=$id" >&2;
     done
