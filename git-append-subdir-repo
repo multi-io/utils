@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+git status >/dev/null  # make sure we're in a git repo
+
+repo="$1"
+subdir="$2"
+
+if [ -z "$repo" -o -z "$subdir" -o ! -d "$repo/.git" -o -e "$subdir" ]; then
+    echo "usage: $0 <git working directory> <subdir>" >&2
+    exit 1
+fi
+
+(cd $repo; git rev-list --reverse HEAD) | while read commit; do
+    echo $commit;
+done
