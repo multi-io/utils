@@ -2,7 +2,7 @@
 
 # in repo R# git-append-subdir-repo S foo
 # # where S is a repository (remote or local), and foo is a (not yet existing) subdirectory of the current directory,
-# #  which must be located in the working directory of a repository (let's call that repository R)
+# #  which must be located in the working directory of another repository (let's call that repository R)
 # =>
 # say R's commit history was R1--R2--R3--R4 and S's was S1--S2--S3, then after the command completes, R will have history R1--R2--R3--R4--S1'--S2'--S3'
 # where any Sx' will be identical to Sx except that any path a/b/c in Sx will be foo/a/b/c in Sx'
@@ -16,16 +16,13 @@ subdir="$2"
 repobranch="${3:-master}"
 
 if [ -z "$repo" -o -z "$subdir" -o ! -d "$repo/.git" -o -e "$subdir" ]; then
-    echo "usage: $0 <git repo> <subdir>" >&2
+    echo "usage: $0 <git repo> <subdir to be created>" >&2
     exit 1
 fi
 
-remote=repo$$
+git fetch -q $repo $repobranch
 
-git remote add $remote $repo
-git fetch $remote $repobranch
-
-git rev-list --reverse $remote/$repobranch | while read commit; do
+git rev-list --reverse FETCH_HEAD | while read commit; do
 
     echo "processing commit $commit" >&2
 
