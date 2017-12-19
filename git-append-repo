@@ -26,15 +26,30 @@ git remote add $remote $repo
 git fetch $remote $repobranch
 
 git rev-list --reverse $remote/$repobranch | while read commit; do
-    echo "processing commit $commit" >&2;
+
+    echo "processing commit $commit" >&2
 
     rm -rf "$subdir"
     mkdir -p "$subdir"
 
     git ls-tree -r -z --full-name --full-tree $commit | while read -d $'\0' line; do
 
-        read mode type id path <<<"$line";
+        read mode type id path <<<"$line"
 
-        echo "got: line=$line params=$_params path=$path mode=$mode type=$type id=$id" >&2;
+        if [ "$type" != "blob" ]; then
+            echo "non-blob ($type) object $id in commit $commit" >&2
+            continue
+        fi
+
+        echo "file: blob=$id mode=$mode path=$path" >&2
+
+        pathdir=$(dirname "$path")
+        mkdir -p "$subdir/$pathdir"
+        git show "$id" >"$subdir/$path"
+        chmod "$mode" "$subdir/$path"
     done
+
+    git add -A "$subdir"
+
+    git commit -C "$commit"
 done
