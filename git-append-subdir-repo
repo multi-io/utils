@@ -1,17 +1,31 @@
 #!/bin/bash
 
+# in repo R# git-append-subdir-repo S foo
+# =>
+# say R's commit history was R1--R2--R3--R4 and S's was S1--S2--S3, then the new R afterwards will have history R1--R2--R3--R4--S1'--S2'--S3'
+# where any Sx' will be identical to Sx except that any path a/b/c in Sx will be foo/a/b/c in Sx'
+
 set -e
 
 git status >/dev/null  # make sure we're in a git repo
 
 repo="$1"
 subdir="$2"
+repobranch="${3:-master}"
 
 if [ -z "$repo" -o -z "$subdir" -o ! -d "$repo/.git" -o -e "$subdir" ]; then
-    echo "usage: $0 <git working directory> <subdir>" >&2
+    echo "usage: $0 <git repo> <subdir>" >&2
     exit 1
 fi
 
-(cd $repo; git rev-list --reverse HEAD) | while read commit; do
-    echo $commit;
+remote=repo$$
+
+git remote add $remote $repo
+git fetch $remote $repobranch
+
+git rev-list --reverse $remote/$repobranch | while read commit; do
+    echo "===> $commit:";
+    git ls-tree -r --full-name --full-tree $commit;
+
+    # TODO continue
 done
