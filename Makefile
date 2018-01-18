@@ -85,6 +85,8 @@ jsonpp \
 json_pp_perline \
 kill-flashplugin \
 kill-vpn.sh \
+kube-node-extip \
+kube-pod-node \
 kubectl-switch-ns \
 kubectl-get-ns \
 locateme \

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+ns=default
+
+while getopts 'n:' OPTNAME; do
+case "$OPTNAME" in
+  "n")
+    ns="$OPTARG" ;;
+esac
+done
+
+shift $(($OPTIND - 1))
+
+kubectl --namespace="$ns" get pod $1 -o json | jq -r .spec.nodeName
+

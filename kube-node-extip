@@ -1,0 +1,4 @@
+#!/bin/sh
+
+kubectl get node "$1" -o json | jq -r '.status.addresses[] | select(.type=="ExternalIP") | .address'
+
