@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# in repo R# git-append-subdir-repo S foo
+# in repo R# git-append-repo S foo
 # # where S is a repository (remote or local), and foo is a (not yet existing) subdirectory of the current directory,
 # #  which must be located in the working directory of another repository (let's call that repository R)
 # =>
@@ -43,7 +43,7 @@ git rev-list --reverse FETCH_HEAD | while read commit; do
         pathdir=$(dirname "$path")
         mkdir -p "$subdir/$pathdir"
         git show "$id" >"$subdir/$path"
-        chmod "$mode" "$subdir/$path"
+        chmod "${mode#?}" "$subdir/$path"
     done
 
     git add -A "$subdir"
