@@ -43,7 +43,7 @@ git rev-list --reverse FETCH_HEAD | while read commit; do
         pathdir=$(dirname "$path")
         mkdir -p "$subdir/$pathdir"
         git show "$id" >"$subdir/$path"
-        chmod "${mode#?}" "$subdir/$path"
+        chmod "${mode#??}" "$subdir/$path"
     done
 
     git add -A "$subdir"
