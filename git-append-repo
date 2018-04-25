@@ -15,7 +15,7 @@ repo="$1"
 subdir="$2"
 repobranch="${3:-master}"
 
-if [ -z "$repo" -o -z "$subdir" -o ! -d "$repo/.git" -o -e "$subdir" ]; then
+if [ -z "$repo" -o -z "$subdir" -o -e "$subdir" ]; then
     echo "usage: $0 <git repo> <subdir to be created>" >&2
     exit 1
 fi
