@@ -112,6 +112,12 @@
 %.ogg: %.wav
 	oggenc -b 160 $<
 
-#########some "catch-all" last resorts
+
+#########video
+# TODO: anything to mp4 (intelligently, i.e. avoid transcoding unless needed)
+%.mp4: %.wmv
+	ffmpeg -i $< -c:v libx264 -crf 23 -c:a aac -q:a 100 $@
+
+#########catch-all last resorts
 %.ps: %
 	a2ps -o $@ $<
