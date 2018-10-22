@@ -85,6 +85,7 @@ jsonpp \
 json_pp_perline \
 kill-flashplugin \
 kill-vpn.sh \
+kube-serviceaccount-kubeconfig \
 kube-node-extip \
 kube-pod-node \
 kubectl-switch-ns \
