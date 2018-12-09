@@ -21,6 +21,7 @@ cdisoburn \
 create-index-htmls \
 cutv \
 deb-import-signing-key \
+docker-reclaimspace.sh \
 emacs_or_fallback.sh \
 get_wan_ip \
 gtetrinet-configure-keyboard \
