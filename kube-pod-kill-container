@@ -1,0 +1,35 @@
+#!/bin/sh
+# needed e.g. for restarting pods run by kubelet via /etc/kubernetes/manifests/
+
+set -e
+
+ns=default
+
+while getopts 'n:' OPTNAME; do
+case "$OPTNAME" in
+  "n")
+    ns="$OPTARG" ;;
+esac
+done
+
+shift $(($OPTIND - 1))
+
+pod="$1"
+container="$2"
+
+if [[ -z "$pod" ]]; then
+   echo "usage: $0 [-n NAMESPACE] POD [CONTAINER_NUMBER]" >&2
+   exit 1
+fi
+
+if [[ -z "$container" ]]; then
+    container=0
+fi
+
+node="$(kube-pod-node -n $ns $pod)"
+nodeip="$(kube-node-extip $node)"
+container_id=$(kubectl -n $ns get pod $pod -o json | jq ".status.containerStatuses[${container}].containerID" -r | sed 's!docker://!!')
+
+echo "killing container $container_id on node $nodeip" 2>&1
+
+ssh-ignorehostkey "ubuntu@${nodeip}" sudo docker kill "${container_id}"

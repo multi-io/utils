@@ -89,6 +89,7 @@ kill-vpn.sh \
 kube-serviceaccount-kubeconfig \
 kube-node-extip \
 kube-pod-node \
+kube-pod-kill-container \
 kubectl-switch-ns \
 kubectl-get-ns \
 locateme \
