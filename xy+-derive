@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+$start=1;
+while (<STDIN>) {
+    ($x,@ys)=split;
+    if ($start) {
+        $start=0;
+        ($x0,@ys0)=($x,@ys);
+        next;
+    }
+    @ys0Andys = map {[$ys0[$_], $ys[$_]]} (0 .. $#ys);
+    @ds = map { ($$_[1]-$$_[0])/($x-$x0) } @ys0Andys;
+    print "$x0 @{[join(' ', @ds)]}\n";
+    ($x0,@ys0)=($x,@ys);
+}

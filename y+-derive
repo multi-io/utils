@@ -1,0 +1,5 @@
+#!/bin/sh
+
+bindir="$(dirname $0)"
+
+"$bindir/lnum.sh" | "$bindir/xy+-derive" | sed 's/^.*: *//'

@@ -177,6 +177,8 @@ xscreensaver-keepaway \
 xterm-fullscreen \
 xy+-plot \
 xy+-average \
+xy+-derive \
+y+-derive \
 xypairs-derive \
 xypairs-average \
 y+-plot \
