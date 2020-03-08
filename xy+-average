@@ -18,4 +18,5 @@ while (<STDIN>) {
     }
 }
 
+#TODO: weigh averages by length of x intervals
 #TODO: numerical instability due to @avgs being initialized only once?

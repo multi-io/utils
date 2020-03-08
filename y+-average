@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+# IN: - lines with y_0 y_1 ....y_n   on stdin
+#     - n (number of consecutive (y_0,...,y_n) tuples to average) on command line
+# 
+# OUT: - lines with avg_0 avg_1 ... avg_n on stdout, where each avg_x is a
+#        "moving average" of n consecutive y_x's from the input data
+
+$num = $ARGV[0] or die "usage: $0 <number of consecutive (y1,y2,...) tuples to average>";
+
+while (<STDIN>) {
+    (@ys)=split;
+    push @rows, [@ys];
+    map { $avgs[$_] += $ys[$_]/$num } (0..$#ys);
+    if ($#rows == $num - 1) {
+        print join(' ', @avgs) . "\n";
+        (@rm_ys) = @{shift @rows};
+        map { $avgs[$_] -= $rm_ys[$_]/$num } (0..$#rm_ys);
+    }
+}
+
+#TODO: numerical instability due to @avgs being initialized only once?

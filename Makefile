@@ -178,6 +178,7 @@ xterm-fullscreen \
 xy+-plot \
 xy+-average \
 xy+-derive \
+y+-average \
 y+-derive \
 xypairs-derive \
 xypairs-average \
