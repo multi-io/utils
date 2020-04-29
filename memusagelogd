@@ -1,6 +1,6 @@
 #!/bin/sh
 
 while true; do
-  /usr/local/bin/memusage-snapshot >>/var/log/memusage.log ${1-} 2>&1;
+  memusage-snapshot >>/var/log/memusage.log ${1-} 2>&1;
   sleep 120;
 done

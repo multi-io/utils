@@ -1,0 +1,4 @@
+#!/bin/sh
+
+date +'TIME: %x %X (%s)'
+top -o mem -l1 | head -40
