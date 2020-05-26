@@ -1,0 +1,6 @@
+#!/bin/sh
+
+date +'TIME: %x %X (%s)'
+
+# have top dump 2 pages, output the 2nd because the 1st doesn't contain correct cpu usages
+top -o cpu -l 2 | awk '/^Processes:/ { N+=1 } N>1 { print }'

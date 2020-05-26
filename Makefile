@@ -112,6 +112,7 @@ Linux/memusage-log-for-pid \
 Linux/memusage-snapshot \
 Linux/memusage_for_pid_by_lib \
 Darwin/memusage-snapshot \
+Darwin/memusage-snapshot-full \
 mlnet-disksize-watchdog \
 mouseclick \
 mplayerctl \
