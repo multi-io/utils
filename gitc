@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# gitc [globalargs] <command> [commandargs]
+# runs git [globalargs] <command> --color=always [commandargs]
+# useful if stdout is not a tty but you still want colors (e.g. if you're piping into less)
+
+set -e
+
+args=()
+
+while [[ $# -gt 0 ]]; do
+    args+=("$1")
+    if [[ -z "$command_seen" ]] && [[ ! "$1" =~ ^- ]]; then
+        args+=("--color=always")
+        command_seen=1
+    fi
+    shift
+done
+
+exec git "${args[@]}"
