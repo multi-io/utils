@@ -12,12 +12,20 @@ require 'optparse'
 
 style="lines"
 boxwidth="0.7 absolute"
+timefmt=nil
 
 opts = OptionParser.new
 opts.on("-s", "--style VAL") {|val| style=val }
 opts.on("-b", "--boxwidth VAL") {|val| boxwidth=val }
+opts.on("-t", "--timefmt [VAL]") do |val|
+  timefmt = (val ? val : '%d/%m/%y')
+end
 opts.on("-h", "--help") {
-  puts "usage: #{File.basename(__FILE__)} [-s|--style (lines|boxes|...)] [-b|--boxwidth value] [xtitle ytitle0 ytitle1 ... ytitlen]"
+  puts <<~EOS
+    usage: #{File.basename(__FILE__)} [-s|--style (lines|boxes|...)] [-b|--boxwidth value] [-t|timefmt [TFMT]] [xtitle ytitle0 ytitle1 ... ytitlen]
+
+    -t means x values contain unix epoch timestamps, TFMT is the way to format time values on the horizontal axis, defaults to '%d/%m/%y'
+  EOS
   exit
 }
 
@@ -37,7 +45,14 @@ end
 
 puts %Q{set xlabel "#{xtitle}"} if xtitle
 puts "set boxwidth #{boxwidth}"
-puts "plot #{ytitles.map{|title| "'-' with #{style} title '#{title}'"}.join(',')}"
+if timefmt then
+  puts <<~EOS
+    set xdata time
+    set timefmt '%s'
+    set format x '#{timefmt}'
+  EOS
+end
+puts "plot #{ytitles.map{|title| "'-' using 1:2 with #{style} title '#{title}'"}.join(',')}"
 
 (1..n_graphs).each do |y_idx|
   samples.each do |sample|
