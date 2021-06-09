@@ -4,3 +4,9 @@ date +'TIME: %x %X (%s)'
 
 # have top dump 2 pages, output the 2nd because the 1st doesn't contain correct cpu usages
 top -o cpu -l 2 | awk '/^Processes:/ { N+=1 } N>1 { print }'
+
+# the shell runs this every time a prompt is rendered after eval $(pyenv virtualenv-init -)
+# I've seen this become very slow after running e.g. Google Meet sessions for a while,
+# and remain slow even after the system load normalized again.
+# So this serves as a yardstick for detecting this
+echo "pyenv runtime: $(/usr/bin/time -p pyenv sh-activate 2>&1 | awk '/real/ {print $2}')"
