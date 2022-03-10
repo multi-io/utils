@@ -13,10 +13,12 @@ require 'optparse'
 style="lines"
 boxwidth="0.7 absolute"
 timefmt=nil
+yrange='[*:*]'
 
 opts = OptionParser.new
 opts.on("-s", "--style VAL") {|val| style=val }
 opts.on("-b", "--boxwidth VAL") {|val| boxwidth=val }
+opts.on("-y", "--yrange VAL") {|val| yrange=val }
 opts.on("-t", "--timefmt [VAL]") do |val|
   timefmt = (val ? val : '%d/%m/%y')
 end
@@ -45,6 +47,7 @@ end
 
 puts %Q{set xlabel "#{xtitle}"} if xtitle
 puts "set boxwidth #{boxwidth}"
+puts "set yrange #{yrange}"
 if timefmt then
   puts <<~EOS
     set xdata time
