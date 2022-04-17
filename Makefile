@@ -18,6 +18,7 @@ cddamv.pl \
 cddarip.sh \
 cdda-cddbrip \
 cdisoburn \
+create-imgs-ovwpage \
 create-index-htmls \
 cutv \
 deb-import-signing-key \
