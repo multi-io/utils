@@ -67,6 +67,13 @@
 %.png: %.pnm %.pnm_alpha
 	pnmtopng -alpha $*.pnm_alpha <$*.pnm >$@
 
+%.png: %.webp
+	dwebp $< -o $@
+
+%.png: %.avif
+	avifdec --no-strict $< $@
+
+
 # fallback when no .pnm_alpha is available
 %.png: %.pnm
 	pnmtopng <$< >$@
