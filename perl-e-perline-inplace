@@ -2,4 +2,4 @@
 
 expr="$1"; shift
 
-perl -pi -e "$expr" "$@"
+perl -i -ne "$expr" "$@"
