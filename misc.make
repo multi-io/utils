@@ -1,130 +1,130 @@
 #########TeX, dvips
 %.dvi: %.tex
-	latex $< && latex $< || ( rm $@ && false )  # TODO: wie outputfilenamen an latex uebergeben?
+	latex "$<" && latex "$<" || ( rm "$@" && false )  # TODO: wie outputfilenamen an latex uebergeben?
 
 %.pdf: %.tex
-	pdflatex $< && pdflatex $< || ( rm $@ && false )  # TODO: wie outputfilenamen an pdflatex uebergeben?
+	pdflatex "$<" && pdflatex "$<" || ( rm "$@" && false )  # TODO: wie outputfilenamen an pdflatex uebergeben?
 
 %.ps: %.dvi
-	dvips $< -o $@
+	dvips "$<" -o "$@"
 
 %.eps: %.fig
-	fig2dev -L eps $< $@
+	fig2dev -L eps "$<" "$@"
 
 %.eps: %.dia
-	dia -n -e $@ -t eps $<
+	dia -n -e "$@" -t eps "$<"
 
 %.pdf: %.eps
-	epstopdf --outfile=$@ $<
+	epstopdf --outfile="$@" "$<"
 
 %.ps: %.pdf
-	pdf2ps $< $@ 
+	pdf2ps "$<" "$@" 
 
 %.pdf: %.ps
-	ps2pdf $<
+	ps2pdf "$<"
 
 #########PostScript
 %.2.ps: %.ps
-	psnup -2 $< >$@
+	psnup -2 "$<" >"$@"
 
 %.4.ps: %.ps
-	psnup -4 $< >$@
+	psnup -4 "$<" >"$@"
 
 
 #########
 
 %.ps: %.glabels
-	glabels-batch -l -o $@ $<   # DOESNT WORK: glabels ignores "-o" and outputs to output.ps
+	glabels-batch -l -o "$@" "$<"   # DOESNT WORK: glabels ignores "-o" and outputs to output.ps
 
 #########
 
 %.eps: %.gplot
-	(echo 'set terminal postscript eps'; cat $<) | gnuplot >$@
+	(echo 'set terminal postscript eps'; cat "$<") | gnuplot >"$@"
 
 %.eps: %.gnuplot
-	(echo 'set terminal postscript eps'; cat $<) | gnuplot >$@
+	(echo 'set terminal postscript eps'; cat "$<") | gnuplot >"$@"
 
 #########Markdown
 %.html: %.md
-	pandoc $< -o $@
+	pandoc "$<" -o "$@"
 
 
 #########image conversion
 
 
 %.pnm: %.xpm
-	xpmtoppm <$< >$@
+	xpmtoppm <"$<" >"$@"
 
 %.pnm_alpha: %.xpm
-	xpmtoppm --alphaout=- <$< >$@
+	xpmtoppm --alphaout=- <"$<" >"$@"
 
 %.pnm: %.gif
-	giftopnm <$< >$@
+	giftopnm <"$<" >"$@"
 
 %.pnm_alpha: %.gif
-	giftopnm --alphaout=- <$< >$@
+	giftopnm --alphaout=- <"$<" >"$@"
 
 %.png: %.pnm %.pnm_alpha
-	pnmtopng -alpha $*.pnm_alpha <$*.pnm >$@
+	pnmtopng -alpha $*.pnm_alpha <$*.pnm >"$@"
 
 %.png: %.webp
-	dwebp $< -o $@
+	dwebp "$<" -o "$@"
 
 %.png: %.avif
-	avifdec --no-strict $< $@
+	avifdec --no-strict "$<" "$@"
 
 
 # fallback when no .pnm_alpha is available
 %.png: %.pnm
-	pnmtopng <$< >$@
+	pnmtopng <"$<" >"$@"
 
 %.pnm: %.xwd
-	xwdtopnm <$< >$@
+	xwdtopnm <"$<" >"$@"
 
 %.ppm: %.xpm
-	xpmtoppm <$< >$@
+	xpmtoppm <"$<" >"$@"
 
 %.ppm: %.png
-	pngtopnm <$< >$@
+	pngtopnm <"$<" >"$@"
 
 %.gif: %.ppm
-	ppmtogif <$< >$@
+	ppmtogif <"$<" >"$@"
 
 %.ppm: %.bmp
-	bmptoppm <$< >$@
+	bmptoppm <"$<" >"$@"
 
 %.bmp: %.ppm
-	ppmtobmp <$< >$@
+	ppmtobmp <"$<" >"$@"
 
 %.xpm: %.ppm
-	ppmtoxpm <$< >$@
+	ppmtoxpm <"$<" >"$@"
 
 %.jpg %.png %.gif: %.xcf
-	convert -flatten -background transparent $< $@
+	convert -flatten -background transparent "$<" "$@"
 
 #########CD writing
 
 %.iso: %
-	mkisofs -J $< -o $@
+	mkisofs -J "$<" -o "$@"
 
 
 #########audio
 
 %.wav: %.mp3
-	mpg123 -w $@ $<
+	mpg123 -w "$@" "$<"
 
 %.mp3: %.wav
-	lame -h -b 192 $< $@
+	lame -h -b 192 "$<" "$@"
 
 %.ogg: %.wav
-	oggenc -b 160 $<
+	oggenc -b 160 "$<"
 
 
 #########video
 # TODO: anything to mp4 (intelligently, i.e. avoid transcoding unless needed)
 %.mp4: %.wmv
-	ffmpeg -i $< -c:v libx264 -crf 23 -c:a aac -q:a 100 $@
+	ffmpeg -i "$<" -c:v libx264 -crf 23 -c:a aac -q:a 100 "$@"
 
 #########catch-all last resorts
 %.ps: %
-	a2ps -o $@ $<
+	a2ps -o "$@" "$<"
