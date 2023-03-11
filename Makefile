@@ -77,6 +77,7 @@ getpid \
 gianasis \
 grepre \
 grep_instfiles \
+homebrew-collect-gnubins \
 ifaceaddr \
 imagej \
 install-javaplugin \

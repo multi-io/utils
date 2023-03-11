@@ -1,0 +1,29 @@
+#!/bin/sh
+
+set -e
+
+delete=''
+
+while getopts 'd' OPTNAME; do
+case "$OPTNAME" in
+  "d")
+    delete=1 ;;
+esac
+done
+
+shift $(($OPTIND - 1))
+
+target="$1"
+
+mkdir -p "$target"
+
+find /opt/homebrew/Cellar -type l -path '*/gnubin/*' | while read f; do
+    name="$(basename "$f")"
+    linktarget="$(readlink -f "$f")"
+    ln -sf  "$linktarget" "$target/$name"
+done
+
+if [[ "$delete" ]]; then
+    # delete all other files in $target. Ugly hack.
+    find "$target" -mmin +1 -print0 | xargs -0 rm -f
+fi
