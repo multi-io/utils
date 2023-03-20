@@ -108,6 +108,7 @@ m3u2iriver.pl \
 m3u2iriverfile.pl \
 m3uxmms2unx \
 maestro \
+mysqldump-split \
 Linux/memeaters.pl \
 Linux/memeaters1.pl \
 Linux/memusage \

@@ -1,0 +1,29 @@
+#!/bin/bash
+
+outdir="$1"
+
+if [[ -z "$outdir" ]]; then
+    echo "usage: mysqldump .... | $0 OUTPUTDIR" >&2;
+    exit 1;
+fi
+
+gawk -v outdir="$outdir" '
+match($0, /^-- Current Database: `(.*?)`/, a) {
+    db = a[1];
+    outfile = null;
+    #print "db: ", db;
+}
+
+match($0, /^-- Table structure for table `(.*?)`/, a) {
+    table = a[1];
+    #print "table: ", table;
+    outfile = sprintf("%s/%s/%s", outdir, db, table);
+    system(sprintf("mkdir -p %s/%s", outdir, db));
+}
+
+{
+    if (outfile) {
+        print >> outfile
+    }
+}
+'
