@@ -19,10 +19,16 @@ mkdir -p "$target"
 
 # run g* binaries to avoid chicken/egg problem when this script is invoked for the 1st time
 
-gfind /usr/local/Cellar -type l -path '*/gnubin/*' | while read f; do
-    name="$(basename "$f")"
-    linktarget="$(greadlink -f "$f")"
-    ln -sf  "$linktarget" "$target/$name"
+cellars="/opt/homebrew/Cellar /usr/local/Cellar"
+
+for cellar in $cellars; do
+    if [[ -d "$cellar" ]]; then
+        gfind "$cellar" -type l -path '*/gnubin/*' | while read f; do
+            name="$(basename "$f")"
+            linktarget="$(greadlink -f "$f")"
+            ln -sf  "$linktarget" "$target/$name"
+        done
+    fi
 done
 
 exit 0
