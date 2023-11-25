@@ -17,13 +17,17 @@ target="$1"
 
 mkdir -p "$target"
 
-find /opt/homebrew/Cellar -type l -path '*/gnubin/*' | while read f; do
+# run g* binaries to avoid chicken/egg problem when this script is invoked for the 1st time
+
+gfind /usr/local/Cellar -type l -path '*/gnubin/*' | while read f; do
     name="$(basename "$f")"
-    linktarget="$(readlink -f "$f")"
+    linktarget="$(greadlink -f "$f")"
     ln -sf  "$linktarget" "$target/$name"
 done
 
+exit 0
+
 if [[ "$delete" ]]; then
     # delete all other files in $target. Ugly hack.
-    find "$target" -mmin +1 -print0 | xargs -0 rm -f
+    gfind "$target" -mmin +1 -print0 | xargs -0 rm -f
 fi
