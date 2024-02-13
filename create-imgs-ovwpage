@@ -11,7 +11,7 @@ cat <<EOF
     <h1></h1>
 EOF
 
-find . -maxdepth 1 -mindepth 1 -name '*.jpg' -o -name '*.png' | sed 's/^..//' | sort | while read f; do
+find . -maxdepth 1 -mindepth 1 -name '*.jpg' -o -name '*.jpeg' -o -name '*.png' | sed 's/^..//' | sort | while read f; do
     echo "<img src=\"$f\"></img>"
 done
 
