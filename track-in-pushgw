@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+set -e -o pipefail
+
+usage() {
+    cat >&2 <<-EOS
+usage: `basename $0` [-h HOST] [-p PATH] [-m METRIC] COMMAND ARGS...
+
+Run COMMMAND ARGS..., record exit code and push it to a Prometheus
+Pushgateway HOST, request path PATH (format /labelname/value/labelname/value/...),
+metric name METRIC. COMMAND ARGS.. can also be a single COMMAND string containing a
+shell script.
+
+If parameters not set via command line, falls back to env variables \$PUSHGW_HOST,
+\$PUSHGW_PATH, and \$PUSHGW_METRIC, and if those aren't set either, some builtin defaults.
+EOS
+    exit 1
+}
+
+pushgw_host="${PUSHGW_HOST-http://pushgateway:9091}"
+pushgw_path="${PUSHGW_PATH-/job/scriptrun}"
+metric="${PUSHGW_METRIC-script_exit_code}"
+
+while getopts 'h:p:m:' OPTNAME; do
+case "$OPTNAME" in
+  "h")
+    pushgw_host="$OPTARG" ;;
+  "p")
+    pushgw_path="$OPTARG" ;;
+  "m")
+    metric="$OPTARG" ;;
+  "?")
+    usage ;;
+esac
+done
+
+shift $(($OPTIND - 1))
+
+set +e
+sh -c "$@"  # run in sh -c to sypport things like track-in-pushgw command arg arg as well as track-in-pushgw 'command arg arg >outfile'
+ec="$?"
+set -e
+
+httpstatus="$(mktemp)"
+trap "rm -f $httpstatus" EXIT
+
+<<EOF curl --silent --write-out %{http_code} -o /dev/null -XPOST --data-binary @- "${pushgw_host}/metrics${pushgw_path}" >$httpstatus
+# TYPE $metric gauge
+# HELP exit code of script run
+$metric $ec
+EOF
+httpstatus=$(cat $httpstatus)
+
+if [[ "$httpstatus" -lt 200 || "$httpstatus" -ge 300 ]]; then
+    echo "push failed. (HTTP $httpstatus)" >&2
+    exit 1
+fi
+
+exit $ec

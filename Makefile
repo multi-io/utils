@@ -143,6 +143,7 @@ syncmp3s \
 thermal-snapshot \
 timedrun.sh \
 timelogger.pl \
+track-in-pushgw \
 unique-lines \
 unpacksrcrpm.sh \
 unzip2d \
