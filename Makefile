@@ -109,6 +109,7 @@ m3u2iriverfile.pl \
 m3uxmms2unx \
 maestro \
 mysqldump-split \
+mv2unique \
 Linux/memeaters.pl \
 Linux/memeaters1.pl \
 Linux/memusage \

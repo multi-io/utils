@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+findunique() {
+    local src="$1"
+    local destdir="$2"
+    local dest="$destdir/$src"
+    while [[ -f "$dest" ]]; do
+        ext="${src##*.}"
+        dest="$destdir/$(basename "$src" ".$ext")-$(tr -dc A-Za-z0-9 </dev/urandom | head -c 5).$ext" 
+    done
+    echo "$dest"
+}
+
+move() {
+    local src="$1"
+    local dest="$2"
+    dest="$(findunique "$src" "$dest")"
+    echo "mv '$src' '$dest'" >&2
+    mv "$src" "$dest"
+}
+
+srcs=("${@:1:$#-1}")
+dest="${@: -1}"
+ 
+for src in "${srcs[@]}"; do
+    move "$src" "$dest"
+done
+
