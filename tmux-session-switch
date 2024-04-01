@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+sn="$(tmux ls -F '#{session_name}' | sort | fzf-tmux)"
+
+if [[ -n "$TMUX" ]]; then
+    tmux switch-client -t "$sn"
+else
+    tmux attach-session -t "$sn"
+fi

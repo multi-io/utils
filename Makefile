@@ -197,6 +197,8 @@ make-misc \
 misc.make \
 lesscat \
 strace-all \
+tmux-session \
+tmux-session-switch \
 zipjavasources
 
 #GLOBALTARGET=$(HOME)/bin

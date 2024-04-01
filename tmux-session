@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+dir="$1"
+if [[ -z "$dir" ]]; then
+    dir="$(find ~/src ~/smith ~/smith/metakube -maxdepth 1 -mindepth 1 -type d | sort | fzf)"
+fi
+
+dir="$(cd "$dir"; pwd)"
+sn="$(basename "$dir")"
+
+if ! tmux has-session -t "$sn"; then
+    tmux new-session -d -s "$sn" -c "$dir"
+fi
+
+if [[ -n "$TMUX" ]]; then
+    tmux switch-client -t "$sn"
+else
+    tmux attach-session -t "$sn"
+fi
