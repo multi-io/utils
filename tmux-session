@@ -8,12 +8,12 @@ fi
 dir="$(cd "$dir"; pwd)"
 sn="$(basename "$dir")"
 
-if ! tmux has-session -t "$sn"; then
+if ! tmux has-session -t "=$sn"; then
     tmux new-session -d -s "$sn" -c "$dir"
 fi
 
 if [[ -n "$TMUX" ]]; then
-    tmux switch-client -t "$sn"
+    tmux switch-client -t "=$sn"
 else
-    tmux attach-session -t "$sn"
+    tmux attach-session -t "=$sn"
 fi
