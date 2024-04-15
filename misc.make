@@ -102,6 +102,10 @@
 %.jpg %.png %.gif: %.xcf
 	convert -flatten -background transparent "$<" "$@"
 
+# video conversion
+%.gif: %.mp4
+	ffmpeg -i "$<" "$@"
+
 #########CD writing
 
 %.iso: %
