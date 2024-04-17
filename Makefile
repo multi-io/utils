@@ -66,6 +66,7 @@ firefox-print-stacktraces \
 firefox-print-stacktraces.gdbscript \
 fetchmail-shutdown-tunnel.sh \
 file2disk.sh \
+fzf-prjdir \
 Linux/file-cached-blocks \
 fsumup \
 fullpath \

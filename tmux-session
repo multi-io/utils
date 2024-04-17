@@ -2,7 +2,7 @@
 
 dir="$1"
 if [[ -z "$dir" ]]; then
-    dir="$(find ~/src ~/smith ~/smith/metakube -maxdepth 1 -mindepth 1 -type d | sort | fzf)"
+    dir="$(fzf-prjdir)"
 fi
 
 dir="$(cd "$dir"; pwd)"
