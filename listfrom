@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+exec awk -v PAT="$*" '{ if (on) { print } } $0~PAT { on=1 }'
+

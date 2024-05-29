@@ -100,6 +100,8 @@ locateme \
 libusers \
 linehist \
 listexecs \
+listfrom \
+listto \
 lnum.sh \
 log-pcap \
 log-pcap-transferrate \
