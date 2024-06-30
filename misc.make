@@ -114,8 +114,8 @@
 
 #########audio
 
-%.wav: %.mp3
-	mpg123 -w "$@" "$<"
+%.wav: %.*
+	ffmpeg -i "$<" "$@"
 
 %.mp3: %.wav
 	lame -h -b 192 "$<" "$@"
@@ -128,6 +128,9 @@
 # TODO: anything to mp4 (intelligently, i.e. avoid transcoding unless needed)
 %.mp4: %.wmv
 	ffmpeg -i "$<" -c:v libx264 -crf 23 -c:a aac -q:a 100 "$@"
+
+%.m4a: %.mp4
+	ffmpeg -i "$<" -vn -c:a copy "$@"
 
 #########catch-all last resorts
 %.ps: %
