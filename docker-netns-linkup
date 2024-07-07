@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# links a container's network namespace into /var/run/netns so it's visible to "ip netns".
+# must be run as root on the docker host
+
+set -e
+
+id="$(docker container inspect -f '{{.Id}}' "$1")"
+pid="$(docker container inspect -f '{{.State.Pid}}' "$1")"
+
+mkdir -p /var/run/netns
+touch "/var/run/netns/$id"
+mount -o bind "/proc/$pid/ns/net" "/var/run/netns/$id"
