@@ -202,6 +202,7 @@ lesscat \
 strace-all \
 tmux-session \
 tmux-session-switch \
+tmux-session-mk-branch \
 zipjavasources
 
 #GLOBALTARGET=$(HOME)/bin
