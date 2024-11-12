@@ -2,5 +2,5 @@
 
 set -e
 
-tmux-session "$HOME/smith/metakube/$(git branch --show-current)"
+tmux-session-mk "$(git branch --show-current)"
 

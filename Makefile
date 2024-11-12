@@ -202,6 +202,7 @@ lesscat \
 strace-all \
 tmux-session \
 tmux-session-switch \
+tmux-session-mk \
 tmux-session-mk-branch \
 zipjavasources
 
@@ -293,5 +294,6 @@ log-pcap:  log-pcap.d/log-pcap
 log-pcap.d/log-pcap: log-pcap.d/main.c
 	$(MAKE) -C log-pcap.d log-pcap || (echo "WARNING: compiling $@ failed, creating it as a fake stub"; (echo "#!/bin/sh"; echo "echo '$@ could not be compiled at utils make time'") >$@)
 
-
-
+README.md:
+	./README-create >$@
+	

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -e
+
+name="$1"
+
+if [[ -z "$name" ]]; then
+    echo "usage: $0 <sessionname>" >&2
+    exit 1
+fi
+
+dir="$HOME/smith/metakube/$name"
+mkdir -p "$dir"
+tmux-session "$dir"
+
