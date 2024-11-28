@@ -17,9 +17,6 @@
 %.pdf: %.eps
 	epstopdf --outfile="$@" "$<"
 
-%.ps: %.pdf
-	pdf2ps "$<" "$@" 
-
 %.pdf: %.ps
 	ps2pdf "$<"
 
@@ -45,9 +42,14 @@
 	(echo 'set terminal postscript eps'; cat "$<") | gnuplot >"$@"
 
 #########Markdown
-%.html: %.md
-	pandoc "$<" -o "$@"
-
+# using the :3.5-ubuntu image because it's multi-arch, i.e. incl. ARM/aarch64
+# see https://github.com/pandoc/dockerfiles/issues/134#issuecomment-2427405279
+# TODO check back regularly if the untagged image also supports ARM
+%.html %.pdf: %.md
+	docker run --rm \
+		--volume "$$(pwd):/data" \
+		--user $$(id -u):$$(id -g) \
+		pandoc/latex:3.5-ubuntu "$<" -o "$@"
 
 #########image conversion
 
