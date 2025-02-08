@@ -154,6 +154,7 @@ unzip2d \
 update_cookiestxts \
 vcr-chilitv \
 vcr-daily \
+vidconcat-noreenc \
 videnc \
 videnc.sh \
 wait4time \

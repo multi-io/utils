@@ -1,0 +1,15 @@
+#!/bin/bash
+# concat media files (e.g. videos) that all have the same format, size etc, without reencoding
+# usage: $0 input1 input2 .... output
+
+set -eo pipefail
+
+inputs="$(mktemp)"
+trap 'rm -f -- "$inputs"' EXIT
+
+while [[ $# -gt 1 ]]; do
+    echo "file '$(realpath "$1")'" >>"$inputs"
+    shift
+done
+
+ffmpeg -f concat -safe 0 -i "$inputs" -c copy "$1"
