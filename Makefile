@@ -157,6 +157,7 @@ vcr-daily \
 vidconcat-noreenc \
 videnc \
 videnc.sh \
+vidspeedchange \
 wait4time \
 wgetheise.sh \
 wget-completepage \

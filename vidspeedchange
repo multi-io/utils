@@ -1,0 +1,12 @@
+#!/bin/bash
+# speed up / slow down videos
+# usage: $0 FACTOR input output # FACTOR <1 => slowdown >1 => speedup
+# audio, if present, will be removed
+
+set -eo pipefail
+
+factor="$1"
+input="$2"
+output="$3"
+
+ffmpeg -i "$input" -an -filter:v "setpts=$(echo "1/$factor" | bc -l)*PTS" "$output"
