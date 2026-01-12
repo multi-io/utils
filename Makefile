@@ -102,6 +102,7 @@ linehist \
 listexecs \
 listfrom \
 listto \
+tmux-list-all-panes.sh \
 lnum.sh \
 log-pcap \
 log-pcap-transferrate \
