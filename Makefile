@@ -86,6 +86,7 @@ instfilelist.pl \
 ip6to4 \
 irexec.pl \
 iriver2m3ufile.pl \
+jjc \
 jsonpp \
 json_pp_perline \
 kill-flashplugin \
