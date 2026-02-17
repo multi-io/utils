@@ -93,6 +93,7 @@ kill-flashplugin \
 kill-vpn.sh \
 kube-serviceaccount-kubeconfig \
 kube-node-extip \
+kube-node-mem-requests \
 kube-pod-node \
 kube-pod-kill-container \
 kubectl-switch-ns \

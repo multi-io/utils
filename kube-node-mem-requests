@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+# Temporary files
+alloc_file=$(mktemp)
+req_file=$(mktemp)
+
+# 1️⃣ Get allocatable memory per node (Mi)
+kubectl get nodes -o json | jq -r '
+  def toMi:
+    if test("Ki$") then sub("Ki$";"") | tonumber / 1024
+    elif test("Mi$") then sub("Mi$";"") | tonumber
+    elif test("Gi$") then sub("Gi$";"") | tonumber * 1024
+    else 0 end;
+
+  .items[]
+  | .metadata.name as $node
+  | .status.allocatable.memory
+  | toMi
+  | "\($node) \(.|floor)"
+' > "$alloc_file"
+
+
+# 2️⃣ Sum requested memory per node (Mi)
+kubectl get pods --all-namespaces -o json | jq -r '
+  def toMi:
+    if test("Ki$") then sub("Ki$";"") | tonumber / 1024
+    elif test("Mi$") then sub("Mi$";"") | tonumber
+    elif test("Gi$") then sub("Gi$";"") | tonumber * 1024
+    else 0 end;
+
+  .items[]
+  | select(.spec.nodeName != null)
+  | .spec.nodeName as $node
+  | (
+      (
+        [.spec.containers[].resources.requests.memory // "0Mi"]
+        | map(toMi)
+        | add
+      )
+      +
+      (
+        [.spec.initContainers[]?.resources.requests.memory // "0Mi"]
+        | map(toMi)
+        | max // 0
+      )
+    )
+  | "\($node) \(floor)"
+' | awk '
+  { sum[$1] += $2 }
+  END {
+    for (n in sum)
+      print n, sum[n]
+  }
+' > "$req_file"
+
+
+# 3️⃣ Join + compute usage
+printf "%-50s %15s %15s %15s %10s\n" \
+  "NODE" "REQUESTED(Mi)" "ALLOCATABLE(Mi)" "FREE(Mi)" "USED(%)"
+
+join -a1 -a2 \
+  <(sort "$alloc_file") \
+  <(sort "$req_file") | \
+awk '
+  {
+    node=$1
+    alloc=$2
+    req=$3
+
+    if (req == "") req=0
+    if (alloc == "") alloc=0
+
+    free=alloc-req
+    used=(alloc>0)?(req/alloc*100):0
+
+    printf "%-50s %15d %15d %15d %9.0f%%\n",
+      node, req, alloc, free, used
+  }
+' | sort -k5 -nr
+
+
+# Cleanup
+rm -f "$alloc_file" "$req_file"
