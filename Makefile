@@ -36,6 +36,7 @@ gnuplot-png \
 jolietrename \
 jolietrenamecurrdir \
 jolietnamecheckcurrdir \
+llc-cutexact \
 chr \
 chrcodes \
 cpmydir.sh \
