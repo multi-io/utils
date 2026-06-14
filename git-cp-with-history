@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -e
+
+git status >/dev/null  # make sure we're in a git repo
+
+src="$1"
+dest="$2"
+
+if [[ -z "$src" || -z "$dest" || -e "$dest" || ! -e "$src" ]]; then
+    echo "usage: $0 SRC DEST" >&2
+    echo "SRC must exist, DEST must not"
+    exit 1
+fi
+
+git log --reverse --format=%H -- "$src" | while read commit; do
+
+    echo "processing commit $commit" >&2
+
+    rm -rf "$dest"
+
+    git ls-tree -r -z --full-name --full-tree $commit | while read -d $'\0' line; do
+
+        read mode type id name <<<"$line"
+
+        if [[ "$type" != "blob" || ! "$name" =~ "$src"* ]]; then
+            continue
+        fi
+
+        destname="${name/$src/$dest}"
+
+        # echo "commit $commit file: blob=$id mode=$mode name=$name destname=$destname" >&2
+
+        destdir=$(dirname "$destname")
+        mkdir -p "$destdir"
+        git show "$id" >"$destname"
+        chmod "${mode#??}" "$destname"
+    done
+
+    git add -A "$dest"
+
+    git commit -C "$commit"
+done

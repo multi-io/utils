@@ -29,6 +29,7 @@ gtetrinet-configure-keyboard \
 gtetrinet-unconfigure-keyboard \
 gitc \
 git-append-repo \
+git-cp-with-history \
 gnuplot-and-wait \
 gnuplot-eps \
 gnuplot-eps-and-wait \
