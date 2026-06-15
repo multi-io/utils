@@ -31,8 +31,7 @@ git log --reverse --format=%H -- "$src" | while read commit; do
 
         # echo "commit $commit file: blob=$id mode=$mode name=$name destname=$destname" >&2
 
-        destdir=$(dirname "$destname")
-        mkdir -p "$destdir"
+        mkdir -p "$(dirname "$destname")"
         git show "$id" >"$destname"
         chmod "${mode#??}" "$destname"
     done
