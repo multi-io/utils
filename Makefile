@@ -138,6 +138,8 @@ pidof \
 prepend-time \
 pslibs.pl \
 quotelines \
+rbw-default \
+rbw-sys11 \
 rfcidx.pl \
 rminst \
 run-if-not-running.sh \
