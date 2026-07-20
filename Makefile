@@ -18,6 +18,7 @@ cddamv.pl \
 cddarip.sh \
 cdda-cddbrip \
 cdisoburn \
+cp2unique \
 create-imgs-ovwpage \
 create-index-htmls \
 cutv \
