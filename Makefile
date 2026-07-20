@@ -6,6 +6,7 @@ apt-list-contents \
 apt-build \
 audioreset \
 blackscrn.pl \
+chrome-with-profile \
 cdburn \
 cdburn-rr \
 dvdburn \

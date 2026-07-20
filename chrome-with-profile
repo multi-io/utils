@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -e
+
+if type -p chrome >/dev/null; then
+    executable=chrome
+else
+    executable="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+fi
+
+if [[ ! -x "$executable" ]]; then
+    echo "chrome not found" >&2
+    exit 1
+fi
+
+[[ -z "$CHROME_PROFILE" ]] && CHROME_PROFILE=Default
+
+"$executable" --profile-directory="$CHROME_PROFILE" "$@"
