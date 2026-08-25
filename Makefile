@@ -150,6 +150,7 @@ sensible-browser \
 settimefromntp \
 show-encrypted \
 slowdown.pl \
+srt-convert \
 sumsizes \
 sumup \
 syncmp3s \

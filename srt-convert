@@ -1,0 +1,181 @@
+#!/usr/bin/env python3
+
+"""Shift and scale the cue timestamps in an SRT subtitle stream."""
+
+import argparse
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+import re
+import sys
+
+
+SHIFT_RE = re.compile(
+    r"^(?P<sign>[+-]?)(?P<hours>\d{2,}):(?P<minutes>\d{2}):"
+    r"(?P<seconds>\d{2}),(?P<fraction>\d{1,3})$"
+)
+TIMESTAMP_RE = re.compile(
+    r"^(?P<hours>\d{2,}):(?P<minutes>\d{2}):"
+    r"(?P<seconds>\d{2}),(?P<milliseconds>\d{3})$"
+)
+TIMING_LINE_RE = re.compile(
+    r"^(?P<start>\d{2,}:\d{2}:\d{2},\d{3})"
+    r"(?P<arrow>\s+-->\s+)"
+    r"(?P<end>\d{2,}:\d{2}:\d{2},\d{3})"
+    r"(?P<suffix>.*)$"
+)
+
+
+class SrtError(ValueError):
+    pass
+
+
+def parse_shift(value):
+    match = SHIFT_RE.fullmatch(value)
+    if not match:
+        raise argparse.ArgumentTypeError(
+            "shift must have the form [+|-]HH:MM:SS,mmm"
+        )
+
+    minutes = int(match.group("minutes"))
+    seconds = int(match.group("seconds"))
+    if minutes >= 60 or seconds >= 60:
+        raise argparse.ArgumentTypeError("shift minutes and seconds must be below 60")
+
+    fraction = match.group("fraction").ljust(3, "0")
+    milliseconds = (
+        int(match.group("hours")) * 3_600_000
+        + minutes * 60_000
+        + seconds * 1_000
+        + int(fraction)
+    )
+    if match.group("sign") == "-":
+        milliseconds = -milliseconds
+    return milliseconds
+
+
+def parse_scale(value):
+    try:
+        scale = Decimal(value)
+    except InvalidOperation:
+        raise argparse.ArgumentTypeError("scale must be a number") from None
+    if not scale.is_finite() or scale < 0:
+        raise argparse.ArgumentTypeError("scale must be a finite, non-negative number")
+    return scale
+
+
+def parse_args(argv):
+    # argparse otherwise treats a signed timestamp as another option.
+    normalized = []
+    index = 0
+    while index < len(argv):
+        if argv[index] == "-shift" and index + 1 < len(argv):
+            normalized.append("-shift=" + argv[index + 1])
+            index += 2
+        else:
+            normalized.append(argv[index])
+            index += 1
+
+    parser = argparse.ArgumentParser(
+        description="Shift, then scale, all cue timestamps read from standard input."
+    )
+    parser.add_argument(
+        "-shift",
+        type=parse_shift,
+        default=0,
+        metavar="[+|-]HH:MM:SS,mmm",
+        help="offset applied before scaling (default: 00:00:00,000)",
+    )
+    parser.add_argument(
+        "-scale",
+        type=parse_scale,
+        default=Decimal(1),
+        metavar="FACTOR",
+        help="non-negative timestamp multiplier (default: 1)",
+    )
+    return parser.parse_args(normalized)
+
+
+def timestamp_to_milliseconds(value):
+    match = TIMESTAMP_RE.fullmatch(value)
+    if not match:
+        raise SrtError(f"invalid timestamp: {value!r}")
+
+    minutes = int(match.group("minutes"))
+    seconds = int(match.group("seconds"))
+    if minutes >= 60 or seconds >= 60:
+        raise SrtError(f"invalid timestamp: {value!r}")
+
+    return (
+        int(match.group("hours")) * 3_600_000
+        + minutes * 60_000
+        + seconds * 1_000
+        + int(match.group("milliseconds"))
+    )
+
+
+def format_timestamp(milliseconds):
+    hours, remainder = divmod(milliseconds, 3_600_000)
+    minutes, remainder = divmod(remainder, 60_000)
+    seconds, milliseconds = divmod(remainder, 1_000)
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d},{milliseconds:03d}"
+
+
+def transform_timestamp(value, shift, scale):
+    transformed = Decimal(timestamp_to_milliseconds(value) + shift) * scale
+    if transformed < 0:
+        return None
+    rounded = int(transformed.quantize(Decimal(1), rounding=ROUND_HALF_UP))
+    return format_timestamp(rounded)
+
+
+def convert_srt(source, shift, scale):
+    # A BOM is permitted at the start of an otherwise normal UTF-8 SRT stream.
+    if source.startswith("\ufeff"):
+        source = source[1:]
+    blocks = []
+    current_block = []
+    for line in source.splitlines():
+        if line.strip():
+            current_block.append(line)
+        elif current_block:
+            blocks.append(current_block)
+            current_block = []
+    if current_block:
+        blocks.append(current_block)
+    output_blocks = []
+
+    for block_number, lines in enumerate(blocks, start=1):
+        if len(lines) < 2 or not lines[0].strip().isdigit():
+            raise SrtError(f"malformed subtitle cue {block_number}: missing numeric index")
+
+        timing = TIMING_LINE_RE.fullmatch(lines[1])
+        if not timing:
+            raise SrtError(f"malformed subtitle cue {block_number}: invalid timing line")
+
+        start = transform_timestamp(timing.group("start"), shift, scale)
+        end = transform_timestamp(timing.group("end"), shift, scale)
+        if start is None or end is None:
+            continue
+
+        timing_line = (
+            start + timing.group("arrow") + end + timing.group("suffix")
+        )
+        output_blocks.append(
+            "\n".join([str(len(output_blocks) + 1), timing_line, *lines[2:]])
+        )
+
+    return "\n\n".join(output_blocks) + ("\n" if output_blocks else "")
+
+
+def main():
+    args = parse_args(sys.argv[1:])
+    try:
+        output = convert_srt(sys.stdin.read(), args.shift, args.scale)
+    except SrtError as error:
+        print(f"srt-convert: {error}", file=sys.stderr)
+        return 1
+    sys.stdout.write(output)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
