@@ -39,6 +39,7 @@ gnuplot-png \
 jolietrename \
 jolietrenamecurrdir \
 jolietnamecheckcurrdir \
+jwt-decode \
 llc-cutexact \
 chr \
 chrcodes \

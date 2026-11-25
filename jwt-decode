@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# read a JWT from stdin, write its decoded claims (payload) JSON to stdout.
+# Pretty-printed via "jq ." unless --raw is given.
+
+set -e -o pipefail
+
+raw=
+if [[ "$1" == "--raw" ]]; then
+    raw=1
+elif [[ -n "$1" ]]; then
+    echo "usage: $0 [--raw] < token" >&2
+    exit 1
+fi
+
+jwt="$(tr -d '[:space:]')"
+payload="$(echo "$jwt" | cut -d. -f2)"
+
+if [[ -z "$payload" || "$payload" == "$jwt" ]]; then
+    echo "not a JWT (expected header.payload.signature)" >&2
+    exit 1
+fi
+
+# base64url -> base64, re-add padding
+payload="$(echo -n "$payload" | tr -- '-_' '+/')"
+while (( ${#payload} % 4 )); do
+    payload="$payload="
+done
+
+if [[ -n "$raw" ]]; then
+    echo -n "$payload" | base64 -d
+else
+    echo -n "$payload" | base64 -d | jq .
+fi
