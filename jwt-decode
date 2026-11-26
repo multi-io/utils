@@ -1,17 +1,28 @@
 #!/usr/bin/env bash
 
-# read a JWT from stdin, write its decoded claims (payload) JSON to stdout.
-# Pretty-printed via "jq ." unless --raw is given.
+# read a JWT from stdin, write its decoded claims (payload) to stdout.
+#
+# default: pretty-printed JSON with timestamp claims (exp, iat, nbf, auth_time,
+#          updated_at, *_at) annotated with a "// <date>" comment
+# --json:  pretty-printed JSON via "jq ."
+# --json --raw (or just --raw): the base64-decoded JSON, unmodified
 
 set -e -o pipefail
 
-raw=
-if [[ "$1" == "--raw" ]]; then
-    raw=1
-elif [[ -n "$1" ]]; then
-    echo "usage: $0 [--raw] < token" >&2
+usage() {
+    echo "usage: $0 [--json [--raw]] < token" >&2
     exit 1
-fi
+}
+
+json=
+raw=
+for arg in "$@"; do
+    case "$arg" in
+        --json) json=1 ;;
+        --raw) raw=1 ;;
+        *) usage ;;
+    esac
+done
 
 jwt="$(tr -d '[:space:]')"
 payload="$(echo "$jwt" | cut -d. -f2)"
@@ -29,6 +40,10 @@ done
 
 if [[ -n "$raw" ]]; then
     echo -n "$payload" | base64 -d
-else
+elif [[ -n "$json" ]]; then
     echo -n "$payload" | base64 -d | jq .
+else
+    echo -n "$payload" | base64 -d | jq . | perl -MPOSIX=strftime -pe '
+        s{^(\s*"(?:exp|iat|nbf|auth_time|updated_at|[^"]*_at)": (\d+(?:\.\d+)?),?)$}
+         {"$1  // " . strftime("%a %b %d %Y %H:%M:%S %Z", localtime($2))}e'
 fi
